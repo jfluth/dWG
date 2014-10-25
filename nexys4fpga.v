@@ -293,8 +293,8 @@ module Nexys4fpga (
 		.clk 			(sysclk));
 		
 	//	enable system reset for the Demo_CPU and it's program store
-	assign kcpsm6_reset = sysreset | rdl;
-	assign rdl = 1'b0;						// for now not allowing the program store
+	//assign kcpsm6_reset = sysreset | rdl;
+	//assign rdl = 1'b0;						// for now not allowing the program store
 											// to reset the Demo_CPU
 
 

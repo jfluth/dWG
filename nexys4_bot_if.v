@@ -55,7 +55,8 @@ module  nexys4_bot_if (
 /////////////////////////
 	`include "proj2Header.vh"			
 				
-
+    integer count; 
+    
 	// Outgoing from I/O block
 	always @(posedge clk) begin
 		// Currently not going to use the read strobe it will be up to the 
@@ -90,6 +91,17 @@ module  nexys4_bot_if (
 	
 	// Incoming to I/O block
 	always @(posedge clk /*or negedge rst*/) begin
+<<<<<<< HEAD
+=======
+		if (Button[0]) LED[0]  <= 1'b1; else LED[0] <= 1'b0;
+		
+		if (BotInterrupt && (count < 1000000000)) begin 
+		      LED[15] <= 1'b1;
+		      count = count + 1;
+        end
+        else LED[15] <= 1'b0;
+        LED[5] <= BotInterrupt;
+>>>>>>> 47fe3cd93d9b369b3c60b92ed4b6e96a37226a25
 		
 	  //Dig0 <= 8'd16;
 		/*if (!rst) begin // see comment above re: agnostic wrt: reste active high/low

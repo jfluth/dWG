@@ -94,7 +94,6 @@ module Nexys4fpga (
 	//
 	
 	assign	sysclk = clk;
-	assign	sysreset = db_btns[0];
 	assign	JA = {sysclk, sysreset, 6'b000000};	//PWL: what is this whichcraft???
 	
 	//I think this is a mistake carried over from proj1. this means sysreset is *NOT* debounced, right?
@@ -197,8 +196,8 @@ module Nexys4fpga (
 		.LED			(led),			// out to switch LEDs on nexys4
 		
 		// switch & button interface
-		.Button			(db_btns[5:1]),	// debounced buttons in from nexys4
-										// Button[{center,left,right,up,down}]
+		.Button			(db_btns[4:1]),	// debounced buttons in from nexys4
+										// Button[{center,left,up,right,down}]
 		.Switch			(db_sw),		// debounced switches in from nexys4
 		
 		// System Interface
@@ -293,8 +292,8 @@ module Nexys4fpga (
 		.clk 			(sysclk));
 		
 	//	enable system reset for the Demo_CPU and it's program store
-	assign kcpsm6_reset = sysreset | rdl;
-	assign rdl = 1'b0;						// for now not allowing the program store
+	//assign kcpsm6_reset = sysreset | rdl;
+	//assign rdl = 1'b0;						// for now not allowing the program store
 											// to reset the Demo_CPU
 
 

@@ -45,9 +45,9 @@ module  nexys4_bot_if (
 	output	reg	[15:0]	LED,			// out to switch LEDs on nexys4
 	
 	// switch & button interface
-	input		[4:0]	Button,			// Debounced buttons in from nexys4
+	input		[3:0]	Button,			// Debounced buttons in from nexys4
 										// Demo_CPU module expects the following:
-										// Button[{center,left,up,right,down}]
+										// Button[{left,up,right,down}]
 	input		[15:0]	Switch			// Debounced switches in from nexys4
 );
 	
@@ -76,8 +76,8 @@ module  nexys4_bot_if (
 			PA_RMDIST_ALT:	DataOut <= RMDist;			// IBID
 			
 			// In from Nexys4
-			PA_PBTNS:		DataOut <= {3'b0,Button};	// Demo expects 8 bits
-			PA_PBTNS_ALT:	DataOut <= {3'b0,Button};	// Demo expects 8 bits
+			PA_PBTNS:		DataOut <= {Button};
+			PA_PBTNS_ALT:	DataOut <= {Button};
 			PA_SLSWTCH:		DataOut <= Switch[15:8];	// Low-order switches
 			PA_SLSWTCH1508:	DataOut <= Switch[7:0];		// High-order switches
 			
@@ -88,6 +88,9 @@ module  nexys4_bot_if (
 	
 	// Incoming to I/O block
 	always @(posedge clk /*or negedge rst*/) begin
+		if (Button[0]) LED[0]  <= 1'b1; else LED[0] <= 1'b0;
+		if (BotInterrupt) LED[15] <= 1'b1; else LED[15] <= 1'b0;
+		
 	  //Dig0 <= 8'd16;
 		/*if (!rst) begin // see comment above re: agnostic wrt: reste active high/low
 			// Blank 7-Seg Displays
@@ -117,7 +120,7 @@ module  nexys4_bot_if (
 					PA_DIG1:	Dig1  <= DataIn;
 					PA_DIG0:	Dig0  <= DataIn;
 					PA_DP:		DP_l  <= DataIn;
-					PA_DP0704:	DP_h <= DataIn;
+					PA_DP0704:	DP_h  <= DataIn;
 					
 					// Out to LED's
 					PA_LEDS:	 LED[7:0]  <= DataIn;

@@ -50,7 +50,9 @@ module  nexys4_bot_if (
 										// Button[{left,up,right,down}]
 	input		[15:0]	Switch			// Debounced switches in from nexys4
 );
-	
+/////////////////////////
+// End Port Definitions	
+/////////////////////////
 	`include "proj2Header.vh"			
 				
 
@@ -88,8 +90,6 @@ module  nexys4_bot_if (
 	
 	// Incoming to I/O block
 	always @(posedge clk /*or negedge rst*/) begin
-		if (Button[0]) LED[0]  <= 1'b1; else LED[0] <= 1'b0;
-		if (BotInterrupt) LED[15] <= 1'b1; else LED[15] <= 1'b0;
 		
 	  //Dig0 <= 8'd16;
 		/*if (!rst) begin // see comment above re: agnostic wrt: reste active high/low

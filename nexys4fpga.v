@@ -140,7 +140,7 @@ module Nexys4fpga (
 		.dp({DPHigh, DPLow}),
 		
 		// outputs to seven segment display
-		.seg({dp, seg}),			
+		.seg({dp,seg}),			
 		.an(an),
 		
 		// clock and reset signals (100 MHz clock, active low reset)

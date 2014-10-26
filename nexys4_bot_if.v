@@ -2,7 +2,7 @@
 // Paul and Jordans Project
 //
 
-module  nexys4_bot_if #(parameter integer RESET_POLARITY_LOW = 1)(
+module  nexys4_bot_if (
 
 	// system interface
 	input			clk,

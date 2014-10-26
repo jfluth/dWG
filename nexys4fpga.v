@@ -96,7 +96,7 @@ module Nexys4fpga (
 	assign	sysclk = clk;
 	//assign	JA = {sysclk, sysreset, 6'b000000};	//PWL: what is this witchcraft???
 	assign	sysreset = db_btns[0];
-	assign	kcpsm6_reset = sysreset | rdl;
+	assign	kcpsm6_reset = !sysreset | rdl;
 		
 	assign kcpsm6_sleep = 1'b0;	// for now, will not use sleep functionality so tying low
 	
@@ -206,7 +206,7 @@ module Nexys4fpga (
 		
 		// System Interface
 		.clk			(sysclk),
-		.rst			(sysreset));
+		.rst			(!sysreset));
 		
 	///////////////////////////////////////////////////////////////////////////
 	// Instantiate RojoBot
@@ -237,7 +237,7 @@ module Nexys4fpga (
 
 		// System Interface
 		.clk			(sysclk),		// system clock
-		.reset			(sysreset),		// system reset
+		.reset			(!sysreset),		// system reset
 		.upd_sysregs	(upd_sysregs));	// flag from RojoBot to indicate that the system registers 
 										// (LocX, LocY, Sensors, BotInfo) have been updated
 		

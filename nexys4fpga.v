@@ -94,7 +94,11 @@ module Nexys4fpga (
 	//
 	
 	assign	sysclk = clk;
-	assign	JA = {sysclk, sysreset, 6'b000000};	//PWL: what is this whichcraft???
+	//assign	JA = {sysclk, sysreset, 6'b000000};	//PWL: what is this witchcraft???
+	assign	sysreset = db_btns[0];
+	assign	kcpsm6_reset = sysreset | rdl;
+		
+	assign kcpsm6_sleep = 1'b0;	// for now, will not use sleep functionality so tying low
 	
 	//I think this is a mistake carried over from proj1. this means sysreset is *NOT* debounced, right?
 	// assign 	sysreset = btnCpuReset; // btnCpuReset is asserted low
@@ -113,7 +117,7 @@ module Nexys4fpga (
 		.clk(sysclk),	
 		.pbtn_in({btnC, btnL, btnU, btnR, btnD, btnCpuReset}),
 		.switch_in(sw),
-		.pbtn_db({db_btns[5:1], sysreset}),
+		.pbtn_db(db_btns),
 		.swtch_db(db_sw)
 	);	
 	
@@ -191,13 +195,13 @@ module Nexys4fpga (
 		.Dig5			(Dig[5]),
 		.Dig6			(Dig[6]),
 		.Dig7			(Dig[7]),
-		.DP_l			(DPHigh),		// out to low-order decimal points on nexys4
-		.DP_h			(DPLow),		// out to high-order decimal points on nexus
+		.DP_l			(DPLow),		// out to low-order decimal points on nexys4
+		.DP_h			(DPHigh),		// out to high-order decimal points on nexus
 		.LED			(led),			// out to switch LEDs on nexys4
 		
 		// switch & button interface
 		.Button			(db_btns[4:1]),	// debounced buttons in from nexys4
-										// Button[{center,left,up,right,down}]
+										// Button[{left,up,right,down}]
 		.Switch			(db_sw),		// debounced switches in from nexys4
 		
 		// System Interface
@@ -241,7 +245,7 @@ module Nexys4fpga (
 	
 	
 	///////////////////////////////////////////////////////////////////////////
-	// Instantiate PB for Demo (Part 1)
+	// Instantiate Demo_CPU
 	///////////////////////////////////////////////////////////////////////////
 	//
 	//
@@ -267,12 +271,11 @@ module Nexys4fpga (
 		.in_port 		(in_port),
 		.interrupt 		(interrupt),
 		.interrupt_ack 	(interrupt_ack),
-		.reset 			(sysreset),
+		.reset 			(kcpsm6_reset),
 		.sleep			(kcpsm6_sleep),
 		.clk 			(sysclk)); 
 
-	// for now, will not use sleep functionality so tying low
-	assign kcpsm6_sleep = 1'b0;
+
 	
 	
 	///////////////////////////////////////////////////////////////////////////	
@@ -285,16 +288,13 @@ module Nexys4fpga (
 		.C_RAM_SIZE_KWORDS		(2),     	//Program size '1', '2' or '4'
 		.C_JTAG_LOADER_ENABLE	(1'b0))    	//PWL: I set this to zero PWL.....................Include JTAG Loader when set to 1'b1 
 	Code_Store (							
-		//.rdl 			(rdl),
+		.rdl 			(rdl),
 		.enable 		(bram_enable),
 		.address 		(address),
 		.instruction 	(instruction),
 		.clk 			(sysclk));
 		
-	//	enable system reset for the Demo_CPU and it's program store
-	//assign kcpsm6_reset = sysreset | rdl;
-	//assign rdl = 1'b0;						// for now not allowing the program store
-											// to reset the Demo_CPU
+	
 
 
 

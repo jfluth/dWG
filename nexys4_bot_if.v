@@ -2,7 +2,7 @@
 // Paul and Jordans Project
 //
 
-module  nexys4_bot_if (
+module  nexys4_bot_if #(parameter integer RESET_POLARITY_LOW = 1)(
 
 	// system interface
 	input			clk,
@@ -54,8 +54,8 @@ module  nexys4_bot_if (
 // End Port Definitions	
 /////////////////////////
 	`include "proj2Header.vh"			
-				
-    integer count; 
+	//wire reset = RESET_POLARITY_LOW ? ~rst : rst;			
+
     
 	// Outgoing from I/O block
 	always @(posedge clk) begin
@@ -91,14 +91,6 @@ module  nexys4_bot_if (
 	
 	// Incoming to I/O block
 	always @(posedge clk /*or negedge rst*/) begin
-		if (Button[0]) LED[0]  <= 1'b1; else LED[0] <= 1'b0;
-		
-		if (BotInterrupt && (count < 1000000000)) begin 
-		      LED[15] <= 1'b1;
-		      count = count + 1;
-        end
-        else LED[15] <= 1'b0;
-        LED[5] <= BotInterrupt;
 
 		
 	  //Dig0 <= 8'd16;
@@ -148,7 +140,15 @@ module  nexys4_bot_if (
 		
 	// Interrupt Flop
 	always @(posedge clk) begin
-		Interrupt <= BotInterrupt; //PWL: this looks fishy, prolly need some wires
+		if (InterruptAck)
+			Interrupt <= 1'b0;
+		else if (BotInterrupt)
+			Interrupt <= 1'b1;
+		else
+			Interrupt <= Interrupt;
 	end
+	//always @(posedge clk) begin
+	//	Interrupt <= BotInterrupt; //PWL: this looks fishy, prolly need some wires
+	//end
 		
 endmodule

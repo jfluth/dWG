@@ -1,6 +1,7 @@
 // nexys4fpga.v - Top level module for Nexys4 as used in ECE 540 Project 2
 //
 // Paul Long <pwl@pdx.edu>
+// Jordan Fluth <jfluth@gmail.com>
 //
 //
 //

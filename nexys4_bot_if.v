@@ -55,7 +55,11 @@ module  nexys4_bot_if #(parameter integer RESET_POLARITY_LOW = 1)(
 /////////////////////////
 	`include "proj2Header.vh"			
 	//wire reset = RESET_POLARITY_LOW ? ~rst : rst;			
-
+    
+    initial begin 
+        DP_h <= 4'd0;
+        
+    end
     
 	// Outgoing from I/O block
 	always @(posedge clk) begin

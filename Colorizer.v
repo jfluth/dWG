@@ -23,29 +23,28 @@
 module Colorizer(
     input clk,
     input [1:0] worldIn,
-    input [7:0] botIcon,
+    input [11:0] botIcon,
     input enableVideo,
-    output reg [7:0] drawColor
+    output reg [11:0] drawColor
     );
     
-    parameter   BLACK   = 8'b00000000,
-                WHITE   = 8'b11111111,
-                GREY    = 8'b11011011,
-                RED     = 8'b11100000,
-                GREEN   = 8'b00011100;
+    parameter   BLACK   = 12'b000000000000,
+                WHITE   = 12'b111111111111,
+                GREEN   = 12'b000011110000,
+                RED     = 12'b111100000000;
                 
 /*******************************************************************************
     -- INSERT COMMENTS --
 *******************************************************************************/                
     always @ (posedge clk) begin
-        if (~enableVideo) drawColor <= BLACK;
-        else if (botIcon != BLACK) drawColor <= botIcon;
+        if (~enableVideo) drawColor <= BLACK;		// if video is off don't draw
+        else if (botIcon) drawColor <= botIcon;		// if botIcon is not tranparent, draw it
         else begin
-            case (worldIn)
-                2'd0:   drawColor <= WHITE;
-                2'd1:   drawColor <= BLACK;
-                2'b2:   drawColor <= RED;
-                2'd3:   drawColor <= GREY;
+            case (worldIn)							
+                2'd0:   drawColor <= WHITE;			// Background
+                2'd1:   drawColor <= BLACK;			// Line
+                2'b2:   drawColor <= RED;			// Obstruction
+                2'd3:   drawColor <= GREEN;			// Reserved (green)
             endcase
         end
     end

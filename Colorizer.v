@@ -1,12 +1,12 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer: 
+// Engineer: Paul Long and Jordan Fluth
 // 
 // Create Date: 10/25/2014 10:56:23 PM
 // Design Name: 
 // Module Name: Colorizer
-// Project Name: 
+// Project Name: Project 2
 // Target Devices: 
 // Tool Versions: 
 // Description: 

@@ -207,9 +207,9 @@ CONSTANT	CC_SPACE1,		1D		; Space (blank)
 CONSTANT	CC_SPACE2,		1E		; Space (blank)
 CONSTANT	CC_SPACE,		1F		; Space (blank)
 
-; =======================
-; === Bot Sensor Maks ===
-; =======================
+; ============================
+; === Bot Sensor Masks =======
+; ============================
 CONSTANT	BLMask,			07
 CONSTANT	ProxMask,		18
 
@@ -307,6 +307,17 @@ CONSTANT	SP_DIG6,		31		;
 CONSTANT	SP_DIG5,		32		;
 CONSTANT	SP_DIG4,		33		;
 
+;=============================
+;======   Working Set   ======
+;=============================
+CONSTANT 	BLLine,			00
+CONSTANT 	BLLeft,			06
+CONSTANT 	BLRight,		03
+CONSTANT 	BLNone,			07
+
+CONSTANT 	ProxLR, 		03
+CONSTANT 	ProxL,			02
+CONSTANT 	ProxR,			01
 
 ; ===============
 ; === main()  ===
@@ -554,8 +565,50 @@ next_mvmt:		LOAD	s0,		Botinf			; s0[3:0] = Botinf[7:4]
 				SR0	s0							;
 				CALL	mvmt2cc					; translate movement to char code
 				STORE	s1,		SP_DIG4			; and move to digit 4.
-				RETURN							; digit 4 is in the scratchpad RAM				
-								
+				RETURN							; digit 4 is in the scratchpad RAM
+
+;----------------------------------------------------------------------
+;
+;		---- BEGIN MY CODE ----
+;
+;----------------------------------------------------------------------
+				CALL 	inFromProxSensors
+				CALL 	inFromBLSensors
+				COMPARE	BLValue, 	BLLine 	
+				JUMP 	NZ, 		noLine 
+
+onLine:			COMPARE ProxValue,	ProxLR
+				JUMP 	Z, 			hitWall
+				LOAD 	s0, 	SP_LFRF
+				OUTPUT 	s0, 	PA_MOTCTL_IN			
+				RETURN							
+				
+noLine:			COMPARE	BLValue, BLRight 	
+				JUMP 	Z, 		turn_right
+
+				COMPARE	BLValue, BLLeft 	
+				JUMP 	Z, 		turn_left
+
+				COMPARE	BLValue, BLNone
+				JUMP 	Z, 		reverse_one
+
+turn_left:		;read motors
+				;set the turn speed
+				;turn 45 degrees
+				LOAD 	s0, 	SP_LSRF
+				OUTPUT 	s0, 	PA_MOTCTL_IN
+				RETURN
+
+turn_right:		LOAD 	s0, 	SP_LFRS
+				OUTPUT 	s0, 	PA_MOTCTL_IN
+				RETURN
+
+reverse_one:	LOAD 	s0, 	SP_LRRR
+				OUTPUT 	s0, 	PA_MOTCTL_IN							
+				JUMP 	turn_right
+
+hitWall:		;end of road -- you win
+
 
 ; ==============================================================================
 ; === next_hdg() - Calculate  digits for heading (compass setting)           ===
@@ -668,6 +721,19 @@ next_step:		CALL		DEB_rdbtns					; Read the pushbuttons. buttons returned in s0
 
 				LOAD 	s0, MV_STOP
 				OUTPUT 	s0, PA_MOTCTL_IN
+				CALL 	DEB_rdsw
+
+nextOne:		
+
+nextTwo:
+
+nextThree:
+
+nextFour:
+
+nextFive:
+
+nextSix:				
 
 				
 ;*************************

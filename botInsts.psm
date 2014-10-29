@@ -567,36 +567,39 @@ next_mvmt:		LOAD	s0,		Botinf			; s0[3:0] = Botinf[7:4]
 				STORE	s1,		SP_DIG4			; and move to digit 4.
 				RETURN							; digit 4 is in the scratchpad RAM
 
-;----------------------------------------------------------------------
-;
-;		---- BEGIN MY CODE ----
-;
-;----------------------------------------------------------------------
-				CALL 	inFromProxSensors
-				CALL 	inFromBLSensors
-				COMPARE	BLValue, 	BLLine 	
-				JUMP 	NZ, 		noLine 
+;----------------------------------------------
+;							   ----------------
+;		     BEGIN MY CODE     ----------------
+;							   ---------------- 
+;----------------------------------------------
+init:			CALL 	inFromProxSensors		; read the prox sensors
+				CALL 	inFromBLSensors			; read the black line sensors
+				COMPARE	BLValue, 	BLLine 		; check to see if bot in on a black line == 3'b000
+				JUMP 	NZ, 		noLine 		; if not jump to noLine 
 
-onLine:			COMPARE ProxValue,	ProxLR
-				JUMP 	Z, 			hitWall
-				LOAD 	s0, 	SP_LFRF
-				OUTPUT 	s0, 	PA_MOTCTL_IN			
-				RETURN							
+onLine:			COMPARE ProxValue,	ProxLR		; check to see if bot is at a wall
+				JUMP 	Z, 			hitWall		; if so jump to hitWall
+				LOAD 	s0, 	SP_LFRF 		; load a forward motion
+				OUTPUT 	s0, 	PA_MOTCTL_IN	; power the motors
+				RETURN							; return
 				
-noLine:			COMPARE	BLValue, BLRight 	
-				JUMP 	Z, 		turn_right
+noLine:			COMPARE	BLValue, BLRight 		; check if the black line is to the right
+				JUMP 	Z, 		turn_right 		; if so, turn right
 
-				COMPARE	BLValue, BLLeft 	
-				JUMP 	Z, 		turn_left
+				COMPARE	BLValue, BLLeft 		; check if the black line is to the left
+				JUMP 	Z, 		turn_left 		; if so, turn left
 
-				COMPARE	BLValue, BLNone
-				JUMP 	Z, 		reverse_one
+				COMPARE	BLValue, BLNone 		; check if the black line is gone
+				JUMP 	Z, 		reverse_one 	; if so, reverse back to it
 
+				; consider one turning routine
 turn_left:		;read motors
 				;set the turn speed
 				;turn 45 degrees
 				LOAD 	s0, 	SP_LSRF
 				OUTPUT 	s0, 	PA_MOTCTL_IN
+				COMPARE s0, 	2D
+				JUMP
 				RETURN
 
 turn_right:		LOAD 	s0, 	SP_LFRS

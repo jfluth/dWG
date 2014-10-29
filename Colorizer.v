@@ -36,15 +36,19 @@ module Colorizer(
 /*******************************************************************************
     -- INSERT COMMENTS --
 *******************************************************************************/                
-    always @ (posedge clk) begin
+    
+	
+	assign botIcon = 2'b0; // Force for testing, not Icon Module yet :(
+	
+	always @ (posedge clk) begin
         if (~enableVideo) drawColor <= BLACK;		// if video is off don't draw
         else if (botIcon) drawColor <= botIcon;		// if botIcon is not tranparent, draw it
         else begin
             case (worldIn)							
-                2'd0:   drawColor <= WHITE;			// Background
-                2'd1:   drawColor <= BLACK;			// Line
-                2'b2:   drawColor <= RED;			// Obstruction
-                2'd3:   drawColor <= GREEN;			// Reserved (green)
+                2'b00:   drawColor <= WHITE;		// Background
+                2'b01:   drawColor <= BLACK;		// Line
+                2'b10:   drawColor <= RED;			// Obstruction
+                2'b11:   drawColor <= GREEN;		// Reserved (green)
             endcase
         end
     end

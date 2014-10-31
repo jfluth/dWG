@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Nexys4fpga (
+module RoboCop_World (
 
 
 	///////////////////////////////////////////////////////////////////////////
@@ -269,7 +269,7 @@ module Nexys4fpga (
 		.interrupt_vector		(12'h3FF),
 		.scratch_pad_memory_size(64),
 		.hwbuild				(8'h00))
-	Demo_CPU (
+	RoboCop_CPU (
 		.address 		(address),
 		.instruction 	(instruction),
 		.bram_enable 	(bram_enable),
@@ -333,8 +333,8 @@ module Nexys4fpga (
 		.horiz_sync		(Hsync),
 		.vert_sync		(Vsync),
 		.video_on		(vidOn),
-		.pixel_row		({pixRow,2'b0}), 
-		.pixel_column	({pixCol,2'b0}));
+		.pixel_row		(pixRow), 
+		.pixel_column	(pixCol));
 
 
 	///////////////////////////////////////////////////////////////////////////	

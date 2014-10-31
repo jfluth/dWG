@@ -1,9 +1,9 @@
 // Copyright 1986-2014 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2014.3 (win64) Build 1034051 Fri Oct  3 17:14:12 MDT 2014
-// Date        : Thu Oct 30 11:12:35 2014
-// Host        : pair running 64-bit Service Pack 1  (build 7601)
-// Command     : write_verilog -force -mode funcsim {c:/Users/pwl/Git Repos/540/proj2_src/pixClock25/pixClock25_funcsim.v}
+// Date        : Thu Oct 30 21:11:39 2014
+// Host        : IPA running 64-bit major release  (build 9200)
+// Command     : write_verilog -force -mode funcsim {C:/Users/pwl/Git Repos/540/proj2_src/pixClock25/pixClock25_funcsim.v}
 // Design      : pixClock25
 // Purpose     : This verilog netlist is a functional simulation representation of the design and should not be modified
 //               or synthesized. This netlist cannot be used for SDF annotated simulation.

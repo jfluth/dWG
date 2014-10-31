@@ -49,10 +49,10 @@ module icon (
   ///////////////////////////////////////////////////////////////////////////
   // Global Assigns
   ///////////////////////////////////////////////////////////////////////////
-  assign iconTopLeft  = {locX,			locY};
-  assign iconTopRight = {locX+4'd15,	locY};
-  assign iconBotLeft  = {locX,			locY+4'd15};
-  assign iconBotRight = {locX+4'd15,	locY+4'd15};
+  assign iconLeft   = locX;
+  assign iconRight  = locX+10'd15;
+  assign iconTop    = locY;
+  assign iconBottom = locY+10'd15;
   
   
   ///////////////////////////////////////////////////////////////////////////
@@ -77,9 +77,8 @@ module icon (
   // Paint the Icon, otherwise paint "00" (transparency)
   //PWL YOU HAVE THIS MATH WRONG THIS IS WHERE YOU SHOULD BE LOOKING
   always @ (posedge clk) begin
-  /*
-	if (pixCol >= iconTopLeft && pixCol <= iconTopRight &&
-		pixRow >= iconBotLeft && pixRow <= iconBotRight) begin
+	if (pixCol >= iconLeft && pixCol <= iconRight &&
+		pixRow >= iconTop  && pixRow <= iconBottom) begin
 		
 		romAddress <= {pixRow - locY, pixCol - locX};	// index into rom
 		botIcon    <= pixelColor;						// paint that color
@@ -88,8 +87,7 @@ module icon (
 		romAddress <= 9'b0;								// reset index
 		botIcon    <= 12'b0;							// transparent
 		
-	end*/
-	botIcon <= 12'hF00;
+	end
   end
 	  
 

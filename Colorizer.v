@@ -43,14 +43,14 @@ module Colorizer(
 	
 	always @ (posedge clk) begin
         if (~enableVideo) drawColor <= BLACK;		// if video is off show black
-        else /*if (botIcon)*/ drawColor <= botIcon;		// if botIcon is not transparent, draw it
-        /*else begin
+        else if (botIcon) drawColor <= botIcon;		// if botIcon is not transparent, draw it
+        else begin
             case (worldIn)							
                 2'b00:   drawColor <= WHITE;		// Background
                 2'b01:   drawColor <= BLACK;		// Line
                 2'b10:   drawColor <= GREEN;		// Obstruction
                 2'b11:   drawColor <= RED;			// Reserved (green)
             endcase
-        end*/
+        end
     end
 endmodule

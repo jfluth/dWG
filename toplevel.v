@@ -344,8 +344,8 @@ module RoboCop_World (
 	icon #(/* module takes no parameters */)  
 	icon (
 		.clk		(clk),
-		.pixCol		(pixCol),
-		.pixRow		(pixRow),
+		.pixCol		(pixCol>>RESMOD),
+		.pixRow		(pixRow>>RESMOD),
 		.locX		(locx),
 		.locY		(locy),
 		.botIcon	(botIcon));

@@ -5,7 +5,7 @@
 // ECE 540 Project 2: RojoBot World
 //
 // Jordan Fluth <jfluth@gmail.com>
-// Paul Long pwl@pdx.edu
+// Paul Long <pwl@pdx.edu>
 //
 // 25 October 2014
 //
@@ -55,7 +55,7 @@ module Nexys4fpga (
 	parameter SIMULATE = 0;
 	localparam REZMULTIPLIER = 2;	//bit positions to shift the pixels to change resolution
 									// wold map is 128x128 so shift of two take it to 
-									// 512x512
+									// 512x512 {pixRow[7:0],{REZMULTIPLIER{1'b0}}}
 
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ module Nexys4fpga (
 	wire			kcpsm6_sleep;
 
 	// Display related connections
-	wire			pixClock;				//PWL: how wide is this
+	wire			pixClock;
 	wire			vidOn;	
 	wire	[9:0]	pixCol;
 	wire	[9:0]	pixRow;
@@ -303,6 +303,7 @@ module Nexys4fpga (
 	pixClock25	pixClock25 (
 		.clk_in1		(sysclk),
 		.clk_out1		(pixClock),
+		.locked			(),				// unused, leaving this float
 		.reset			(sysreset));
 	
 		
@@ -311,7 +312,7 @@ module Nexys4fpga (
 	///////////////////////////////////////////////////////////////////////////
 	Colorizer #(/* mod takes no parameters */)
 	colorizer (
-		.clk			(pixClock),
+		.clk			(sysclk),
 		.worldIn		(worldPix),
 		.botIcon		(botIcon),
 		.enableVideo	(vidOn),
@@ -328,8 +329,8 @@ module Nexys4fpga (
 		.horiz_sync		(Hsync),
 		.vert_sync		(Vsync),
 		.video_on		(vidOn),
-		.pixel_row		({pixRow,{REZMULTIPLIER{1'b0}}}), // strech that sucker out to 512 x 512
-		.pixel_column	({pixCol,{REZMULTIPLIER{1'b0}}}));// Dear goodness, that's a bunch of parentheses
+		.pixel_row		({pixRow,2'b0}), 
+		.pixel_column	({pixCol,2'b0}));
 
 
 	///////////////////////////////////////////////////////////////////////////	
@@ -337,12 +338,10 @@ module Nexys4fpga (
 	///////////////////////////////////////////////////////////////////////////
 	icon #(/* module takes no parameters */)  
 	icon (
-		.clk		(clk),
+		.clk		(sysclk),
 		.pixCol		(pixCol),
 		.pixRow		(pixRow),
-		
-		.locX		(locX),
-		.locY		(locY),
-		
+		.locX		(locx),
+		.locY		(locy),
 		.botIcon	(botIcon));
 endmodule

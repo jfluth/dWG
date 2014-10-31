@@ -38,7 +38,7 @@ module Colorizer(
 *******************************************************************************/                
     
 	
-	assign botIcon = 2'b0; // Force for testing, not Icon Module yet :(
+	//assign botIcon = 2'b0; // Force for testing, not Icon Module yet :(
 	
 	always @ (posedge clk) begin
         if (~enableVideo) drawColor <= BLACK;		// if video is off don't draw
@@ -47,8 +47,8 @@ module Colorizer(
             case (worldIn)							
                 2'b00:   drawColor <= WHITE;		// Background
                 2'b01:   drawColor <= BLACK;		// Line
-                2'b10:   drawColor <= RED;			// Obstruction
-                2'b11:   drawColor <= GREEN;		// Reserved (green)
+                2'b10:   drawColor <= GREEN;			// Obstruction
+                2'b11:   drawColor <= RED;		// Reserved (green)
             endcase
         end
     end

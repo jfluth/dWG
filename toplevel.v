@@ -53,6 +53,9 @@ module Nexys4fpga (
 	
 	// parameter
 	parameter SIMULATE = 0;
+	localparam REZMULTIPLIER = 2;	//bit positions to shift the pixels to change resolution
+									// wold map is 128x128 so shift of two take it to 
+									// 512x512
 
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -115,11 +118,10 @@ module Nexys4fpga (
 	assign sysclk = clk;
 
 	assign sysreset = !db_btns[0];
-	assign kcpsm6_reset = sysreset | rdl;
+	assign kcpsm6_reset	= sysreset | rdl;
 	assign kcpsm6_sleep = 1'b0;	// for now, will not use sleep functionality so tying low
-	
+
 	// PWL DEBUG STUFF
-	assign botIcon	= 12'b0;		// PWL: I don;t have an Icon module yet :(
 	assign JA[5:1] 	= {sysclk,Vsync,Hsync,vidOn,pixClock};
 	 
 	
@@ -141,8 +143,6 @@ module Nexys4fpga (
 	///////////////////////////////////////////////////////////////////////////	
 	// Instantiate the 7-segment, 8-digit display
 	///////////////////////////////////////////////////////////////////////////
-	//
-	
 	sevensegment #(
 		.RESET_POLARITY_LOW(0),
 		.SIMULATE(SIMULATE))
@@ -174,8 +174,6 @@ module Nexys4fpga (
 	///////////////////////////////////////////////////////////////////////////
 	// Instantiate the I/O controller
 	///////////////////////////////////////////////////////////////////////////
-	//
-	
 	nexys4_bot_if #(
 		/* module currently takes no parameters */)
 	IO_Interface (
@@ -224,10 +222,10 @@ module Nexys4fpga (
 		.clk			(sysclk),
 		.rst			(sysreset));
 		
+		
 	///////////////////////////////////////////////////////////////////////////
 	// Instantiate RojoBot
 	///////////////////////////////////////////////////////////////////////////
-
 	bot # (/* bot module has no parameters */)
 	RojoBot_CPU (
 		// Main CSRs
@@ -251,10 +249,8 @@ module Nexys4fpga (
 		.reset			(sysreset),	// system reset
 		.upd_sysregs	(upd_sysregs));	// flag from RojoBot to indicate that the system registers 
 										// (LocX, LocY, Sensors, BotInfo) have been updated
-		
-	
-	
-	
+
+										
 	///////////////////////////////////////////////////////////////////////////
 	// Instantiate RoboCop
 	///////////////////////////////////////////////////////////////////////////
@@ -265,7 +261,6 @@ module Nexys4fpga (
 	// could be left out. Leaving them in here so as to remember that they
 	// exist and can be fiddled with if necessary
 	//
-
 	kcpsm6 #(
 		.interrupt_vector		(12'h3FF),
 		.scratch_pad_memory_size(64),
@@ -285,9 +280,7 @@ module Nexys4fpga (
 		.reset 			(kcpsm6_reset),
 		.sleep			(kcpsm6_sleep),
 		.clk 			(sysclk)); 
-
-
-	
+		
 	
 	///////////////////////////////////////////////////////////////////////////	
 	// Instantiate Demo BRAM (Code Store)
@@ -307,7 +300,7 @@ module Nexys4fpga (
 	///////////////////////////////////////////////////////////////////////////	
 	// Instantiate Pixel Clock
 	///////////////////////////////////////////////////////////////////////////
-	pixClock_25MHz	pixClock25 (
+	pixClock25	pixClock25 (
 		.clk_in1		(sysclk),
 		.clk_out1		(pixClock),
 		.reset			(sysreset));
@@ -318,11 +311,12 @@ module Nexys4fpga (
 	///////////////////////////////////////////////////////////////////////////
 	Colorizer #(/* mod takes no parameters */)
 	colorizer (
-		.clk			(sysclk),
+		.clk			(pixClock),
 		.worldIn		(worldPix),
 		.botIcon		(botIcon),
 		.enableVideo	(vidOn),
 		.drawColor		({vgaRed,vgaGreen,vgaBlue}));
+	
 	
 	///////////////////////////////////////////////////////////////////////////	
 	// Instantiate DTG
@@ -334,8 +328,21 @@ module Nexys4fpga (
 		.horiz_sync		(Hsync),
 		.vert_sync		(Vsync),
 		.video_on		(vidOn),
-		.pixel_row		(pixRow),
-		.pixel_column	(pixCol));
+		.pixel_row		({pixRow,{REZMULTIPLIER{1'b0}}}), // strech that sucker out to 512 x 512
+		.pixel_column	({pixCol,{REZMULTIPLIER{1'b0}}}));// Dear goodness, that's a bunch of parentheses
 
 
+	///////////////////////////////////////////////////////////////////////////	
+	// Instantiate Icon module
+	///////////////////////////////////////////////////////////////////////////
+	icon #(/* module takes no parameters */)  
+	icon (
+		.clk		(clk),
+		.pixCol		(pixCol),
+		.pixRow		(pixRow),
+		
+		.locX		(locX),
+		.locY		(locY),
+		
+		.botIcon	(botIcon));
 endmodule

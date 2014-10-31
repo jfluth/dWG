@@ -117,16 +117,18 @@ module Nexys4fpga (
 	///////////////////////////////////////////////////////////////////////////
 	assign sysclk = clk;
 
-	assign sysreset = !db_btns[0];
+	assign sysreset = !db_btns[0];			// Reset is active low!
 	assign kcpsm6_reset	= sysreset | rdl;
 	assign kcpsm6_sleep = 1'b0;	// for now, will not use sleep functionality so tying low
+	//assign pixCol = pixCol << 2;
+	//assign pixRow = pixRow << 2;
 
 	// PWL DEBUG STUFF
 	assign JA[5:1] 	= {sysclk,Vsync,Hsync,vidOn,pixClock};
 	 
 	
 	///////////////////////////////////////////////////////////////////////////
-	// instantiate the debounce module
+	// Instantiate the debounce module
 	///////////////////////////////////////////////////////////////////////////
 	debounce #(
 		.RESET_POLARITY_LOW(0),
@@ -249,10 +251,12 @@ module Nexys4fpga (
 		.reset			(sysreset),	// system reset
 		.upd_sysregs	(upd_sysregs));	// flag from RojoBot to indicate that the system registers 
 										// (LocX, LocY, Sensors, BotInfo) have been updated
+										// or that timeout has occurred
+										
 
 										
 	///////////////////////////////////////////////////////////////////////////
-	// Instantiate RoboCop
+	// Instantiate RoboCop Line Follower
 	///////////////////////////////////////////////////////////////////////////
 	//
 	//
@@ -286,7 +290,7 @@ module Nexys4fpga (
 	// Instantiate Demo BRAM (Code Store)
 	///////////////////////////////////////////////////////////////////////////
 	proj2demo #(
-		.C_FAMILY				("7S"),   	// setting to '7S' cince we are using a 7-series FPGA
+		.C_FAMILY				("7S"),   	// setting to '7S' since we are using a 7-series FPGA
 		.C_RAM_SIZE_KWORDS		(2),     	//Program size '1', '2' or '4'
 		.C_JTAG_LOADER_ENABLE	(1'b0))    	//PWL: I set this to zero PWL.....................Include JTAG Loader when set to 1'b1 
 	Code_Store (							

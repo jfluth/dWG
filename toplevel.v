@@ -125,7 +125,7 @@ module RoboCop_World (
 	//assign pixRow = pixRow << 2;
 
 	// PWL DEBUG STUFF
-	assign JA[5:1] 	= {2'b0,clk,Vsync,Hsync,vidOn,pixClock,1'b0};
+	assign JA[7:0] 	= {2'b0,clk,Vsync,Hsync,vidOn,pixClock,1'b0};
 	 
 	
 	///////////////////////////////////////////////////////////////////////////

@@ -29,20 +29,21 @@ module icon (
   input			[7:0]	locX,			// RoboCop's current location
   input			[7:0]	locY,			// top left corner
 
-  output	reg	[11:0]	botIcon			// Color that should be output
+  output	reg	[11:0]	botIcon			// Colour that should be output
 );
 
 
   ///////////////////////////////////////////////////////////////////////////
   // Internal Signals
   ///////////////////////////////////////////////////////////////////////////
-  reg	[3:0]	iconX;			// index into columns of icon pixelmap ROM
-  reg	[3:0]	iconY;			// index into rows of icon pixelmap ROM
+  //reg	[3:0]	iconX;			// index into columns of icon pixelmap ROM
+  //reg	[3:0]	iconY;			// index into rows of icon pixelmap ROM
   wire	[7:0]	iconTopLeft;	// Bounds of the icon 
   wire	[7:0]	iconTopRight;
   wire	[7:0]	iconBotLeft;
   wire	[7:0]	iconBotRight;
-  wire	[1:0]	pixelColor;
+  wire	[11:0]	pixelColor;
+  reg	[8:0]	romAddress;
   
   
   ///////////////////////////////////////////////////////////////////////////
@@ -57,37 +58,38 @@ module icon (
   ///////////////////////////////////////////////////////////////////////////
   // Instantiate the Block ROM holding Icon
   ///////////////////////////////////////////////////////////////////////////
-  iconROM iconROM (
+  iconRom2 iconROM (
 	.clka	(clk),
-	.ena	(1'b0),
-	.addra	(pixelAddress),
+	.ena	(1'b0),				// Always enabled
+	.addra	(romAddress),
 	.douta	(pixelColor));
   
-  
+  /*
   // Set index into icon ROM
   always @ (posedge clk) begin
 	iconX <= pixCol - iconX;
 	iconY <= pixRow - iconY;
   end
-
+  */
  
   // Decide when to paint the botIcon
   // If (pixCol,pixRow) overlap (locX,locY) to (locX+15,locY+15)
   // Paint the Icon, otherwise paint "00" (transparency)
-  
-  
-  
-  ///PWL YOU HAVE THIS MATH WRONG THIS IS WHER YOU SHOULD BE LOOKING
+  //PWL YOU HAVE THIS MATH WRONG THIS IS WHERE YOU SHOULD BE LOOKING
   always @ (posedge clk) begin
+  /*
 	if (pixCol >= iconTopLeft && pixCol <= iconTopRight &&
 		pixRow >= iconBotLeft && pixRow <= iconBotRight) begin
 		
-		botIcon <= 2'b1/*pixelColor*/;
+		romAddress <= {pixRow - locY, pixCol - locX};	// index into rom
+		botIcon    <= pixelColor;						// paint that color
 	end
 	else begin
-		botIcon <= 2'b0/*1;*/
+		romAddress <= 9'b0;								// reset index
+		botIcon    <= 12'b0;							// transparent
 		
-	end
+	end*/
+	botIcon <= 12'hF00;
   end
 	  
 

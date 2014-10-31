@@ -1,9 +1,9 @@
 // Copyright 1986-2014 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2014.3 (win64) Build 1034051 Fri Oct  3 17:14:12 MDT 2014
-// Date        : Thu Oct 30 21:11:39 2014
+// Date        : Thu Oct 30 21:51:49 2014
 // Host        : IPA running 64-bit major release  (build 9200)
-// Command     : write_verilog -force -mode synth_stub {C:/Users/pwl/Git Repos/540/proj2_src/pixClock25/pixClock25_stub.v}
+// Command     : write_verilog -force -mode synth_stub {c:/Users/pwl/Git Repos/540/proj2_src/pixClock25/pixClock25_stub.v}
 // Design      : pixClock25
 // Purpose     : Stub declaration of top-level module interface
 // Device      : xc7a100tcsg324-1

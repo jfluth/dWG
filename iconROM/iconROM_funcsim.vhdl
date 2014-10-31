@@ -1,9 +1,9 @@
 -- Copyright 1986-2014 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2014.3 (win64) Build 1034051 Fri Oct  3 17:14:12 MDT 2014
--- Date        : Thu Oct 30 16:44:42 2014
--- Host        : pair running 64-bit Service Pack 1  (build 7601)
--- Command     : write_vhdl -force -mode funcsim {C:/Users/pwl/Git Repos/540/proj2_src/iconROM/iconROM_funcsim.vhdl}
+-- Date        : Thu Oct 30 21:50:55 2014
+-- Host        : IPA running 64-bit major release  (build 9200)
+-- Command     : write_vhdl -force -mode funcsim {c:/Users/pwl/Git Repos/540/proj2_src/iconROM/iconROM_funcsim.vhdl}
 -- Design      : iconROM
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -17,6 +17,7 @@ entity iconROM_blk_mem_gen_prim_wrapper_init is
   port (
     douta : out STD_LOGIC_VECTOR ( 1 downto 0 );
     clka : in STD_LOGIC;
+    ena : in STD_LOGIC;
     addra : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
   attribute ORIG_REF_NAME : string;
@@ -252,10 +253,10 @@ begin
       DOPADOP(0) => \n_33_DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram\,
       DOPBDOP(1) => \n_34_DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram\,
       DOPBDOP(0) => \n_35_DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram\,
-      ENARDEN => '1',
-      ENBWREN => '1',
-      REGCEAREGCE => '1',
-      REGCEB => '1',
+      ENARDEN => ena,
+      ENBWREN => ena,
+      REGCEAREGCE => ena,
+      REGCEB => ena,
       RSTRAMARSTRAM => '0',
       RSTRAMB => '0',
       RSTREGARSTREG => '0',
@@ -276,6 +277,7 @@ entity iconROM_blk_mem_gen_prim_width is
   port (
     douta : out STD_LOGIC_VECTOR ( 1 downto 0 );
     clka : in STD_LOGIC;
+    ena : in STD_LOGIC;
     addra : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
   attribute ORIG_REF_NAME : string;
@@ -288,7 +290,8 @@ begin
     port map (
       addra(7 downto 0) => addra(7 downto 0),
       clka => clka,
-      douta(1 downto 0) => douta(1 downto 0)
+      douta(1 downto 0) => douta(1 downto 0),
+      ena => ena
     );
 end STRUCTURE;
 library IEEE;
@@ -299,6 +302,7 @@ entity iconROM_blk_mem_gen_generic_cstr is
   port (
     douta : out STD_LOGIC_VECTOR ( 1 downto 0 );
     clka : in STD_LOGIC;
+    ena : in STD_LOGIC;
     addra : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
   attribute ORIG_REF_NAME : string;
@@ -311,7 +315,8 @@ begin
     port map (
       addra(7 downto 0) => addra(7 downto 0),
       clka => clka,
-      douta(1 downto 0) => douta(1 downto 0)
+      douta(1 downto 0) => douta(1 downto 0),
+      ena => ena
     );
 end STRUCTURE;
 library IEEE;
@@ -322,6 +327,7 @@ entity iconROM_blk_mem_gen_top is
   port (
     douta : out STD_LOGIC_VECTOR ( 1 downto 0 );
     clka : in STD_LOGIC;
+    ena : in STD_LOGIC;
     addra : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
   attribute ORIG_REF_NAME : string;
@@ -334,7 +340,8 @@ begin
     port map (
       addra(7 downto 0) => addra(7 downto 0),
       clka => clka,
-      douta(1 downto 0) => douta(1 downto 0)
+      douta(1 downto 0) => douta(1 downto 0),
+      ena => ena
     );
 end STRUCTURE;
 library IEEE;
@@ -345,6 +352,7 @@ entity iconROM_blk_mem_gen_v8_2_synth is
   port (
     douta : out STD_LOGIC_VECTOR ( 1 downto 0 );
     clka : in STD_LOGIC;
+    ena : in STD_LOGIC;
     addra : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
   attribute ORIG_REF_NAME : string;
@@ -357,7 +365,8 @@ begin
     port map (
       addra(7 downto 0) => addra(7 downto 0),
       clka => clka,
-      douta(1 downto 0) => douta(1 downto 0)
+      douta(1 downto 0) => douta(1 downto 0),
+      ena => ena
     );
 end STRUCTURE;
 library IEEE;
@@ -368,6 +377,7 @@ entity \iconROM_blk_mem_gen_v8_2__parameterized0\ is
   port (
     douta : out STD_LOGIC_VECTOR ( 1 downto 0 );
     clka : in STD_LOGIC;
+    ena : in STD_LOGIC;
     addra : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
   attribute ORIG_REF_NAME : string;
@@ -380,7 +390,8 @@ inst_blk_mem_gen: entity work.iconROM_blk_mem_gen_v8_2_synth
     port map (
       addra(7 downto 0) => addra(7 downto 0),
       clka => clka,
-      douta(1 downto 0) => douta(1 downto 0)
+      douta(1 downto 0) => douta(1 downto 0),
+      ena => ena
     );
 end STRUCTURE;
 library IEEE;
@@ -390,6 +401,7 @@ use UNISIM.VCOMPONENTS.ALL;
 entity iconROM is
   port (
     clka : in STD_LOGIC;
+    ena : in STD_LOGIC;
     addra : in STD_LOGIC_VECTOR ( 7 downto 0 );
     douta : out STD_LOGIC_VECTOR ( 1 downto 0 )
   );
@@ -402,7 +414,7 @@ entity iconROM is
   attribute CHECK_LICENSE_TYPE : string;
   attribute CHECK_LICENSE_TYPE of iconROM : entity is "iconROM,blk_mem_gen_v8_2,{}";
   attribute core_generation_info : string;
-  attribute core_generation_info of iconROM : entity is "iconROM,blk_mem_gen_v8_2,{x_ipProduct=Vivado 2014.3,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=blk_mem_gen,x_ipVersion=8.2,x_ipCoreRevision=2,x_ipLanguage=VERILOG,C_FAMILY=artix7,C_XDEVICEFAMILY=artix7,C_ELABORATION_DIR=./,C_INTERFACE_TYPE=0,C_AXI_TYPE=1,C_AXI_SLAVE_TYPE=0,C_USE_BRAM_BLOCK=0,C_ENABLE_32BIT_ADDRESS=0,C_CTRL_ECC_ALGO=NONE,C_HAS_AXI_ID=0,C_AXI_ID_WIDTH=4,C_MEM_TYPE=3,C_BYTE_SIZE=9,C_ALGORITHM=1,C_PRIM_TYPE=1,C_LOAD_INIT_FILE=1,C_INIT_FILE_NAME=iconROM.mif,C_INIT_FILE=iconROM.mem,C_USE_DEFAULT_DATA=0,C_DEFAULT_DATA=0,C_HAS_RSTA=0,C_RST_PRIORITY_A=CE,C_RSTRAM_A=0,C_INITA_VAL=0,C_HAS_ENA=0,C_HAS_REGCEA=0,C_USE_BYTE_WEA=0,C_WEA_WIDTH=1,C_WRITE_MODE_A=WRITE_FIRST,C_WRITE_WIDTH_A=2,C_READ_WIDTH_A=2,C_WRITE_DEPTH_A=256,C_READ_DEPTH_A=256,C_ADDRA_WIDTH=8,C_HAS_RSTB=0,C_RST_PRIORITY_B=CE,C_RSTRAM_B=0,C_INITB_VAL=0,C_HAS_ENB=0,C_HAS_REGCEB=0,C_USE_BYTE_WEB=0,C_WEB_WIDTH=1,C_WRITE_MODE_B=WRITE_FIRST,C_WRITE_WIDTH_B=2,C_READ_WIDTH_B=2,C_WRITE_DEPTH_B=256,C_READ_DEPTH_B=256,C_ADDRB_WIDTH=8,C_HAS_MEM_OUTPUT_REGS_A=1,C_HAS_MEM_OUTPUT_REGS_B=0,C_HAS_MUX_OUTPUT_REGS_A=0,C_HAS_MUX_OUTPUT_REGS_B=0,C_MUX_PIPELINE_STAGES=0,C_HAS_SOFTECC_INPUT_REGS_A=0,C_HAS_SOFTECC_OUTPUT_REGS_B=0,C_USE_SOFTECC=0,C_USE_ECC=0,C_EN_ECC_PIPE=0,C_HAS_INJECTERR=0,C_SIM_COLLISION_CHECK=ALL,C_COMMON_CLK=0,C_DISABLE_WARN_BHV_COLL=0,C_EN_SLEEP_PIN=0,C_DISABLE_WARN_BHV_RANGE=0,C_COUNT_36K_BRAM=0,C_COUNT_18K_BRAM=1,C_EST_POWER_SUMMARY=Estimated Power for IP     _     2.048762 mW}";
+  attribute core_generation_info of iconROM : entity is "iconROM,blk_mem_gen_v8_2,{x_ipProduct=Vivado 2014.3,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=blk_mem_gen,x_ipVersion=8.2,x_ipCoreRevision=2,x_ipLanguage=VERILOG,C_FAMILY=artix7,C_XDEVICEFAMILY=artix7,C_ELABORATION_DIR=./,C_INTERFACE_TYPE=0,C_AXI_TYPE=1,C_AXI_SLAVE_TYPE=0,C_USE_BRAM_BLOCK=0,C_ENABLE_32BIT_ADDRESS=0,C_CTRL_ECC_ALGO=NONE,C_HAS_AXI_ID=0,C_AXI_ID_WIDTH=4,C_MEM_TYPE=3,C_BYTE_SIZE=9,C_ALGORITHM=1,C_PRIM_TYPE=1,C_LOAD_INIT_FILE=1,C_INIT_FILE_NAME=iconROM.mif,C_INIT_FILE=iconROM.mem,C_USE_DEFAULT_DATA=0,C_DEFAULT_DATA=0,C_HAS_RSTA=0,C_RST_PRIORITY_A=CE,C_RSTRAM_A=0,C_INITA_VAL=0,C_HAS_ENA=1,C_HAS_REGCEA=0,C_USE_BYTE_WEA=0,C_WEA_WIDTH=1,C_WRITE_MODE_A=WRITE_FIRST,C_WRITE_WIDTH_A=2,C_READ_WIDTH_A=2,C_WRITE_DEPTH_A=256,C_READ_DEPTH_A=256,C_ADDRA_WIDTH=8,C_HAS_RSTB=0,C_RST_PRIORITY_B=CE,C_RSTRAM_B=0,C_INITB_VAL=0,C_HAS_ENB=0,C_HAS_REGCEB=0,C_USE_BYTE_WEB=0,C_WEB_WIDTH=1,C_WRITE_MODE_B=WRITE_FIRST,C_WRITE_WIDTH_B=2,C_READ_WIDTH_B=2,C_WRITE_DEPTH_B=256,C_READ_DEPTH_B=256,C_ADDRB_WIDTH=8,C_HAS_MEM_OUTPUT_REGS_A=1,C_HAS_MEM_OUTPUT_REGS_B=0,C_HAS_MUX_OUTPUT_REGS_A=0,C_HAS_MUX_OUTPUT_REGS_B=0,C_MUX_PIPELINE_STAGES=0,C_HAS_SOFTECC_INPUT_REGS_A=0,C_HAS_SOFTECC_OUTPUT_REGS_B=0,C_USE_SOFTECC=0,C_USE_ECC=0,C_EN_ECC_PIPE=0,C_HAS_INJECTERR=0,C_SIM_COLLISION_CHECK=ALL,C_COMMON_CLK=0,C_DISABLE_WARN_BHV_COLL=0,C_EN_SLEEP_PIN=0,C_DISABLE_WARN_BHV_RANGE=0,C_COUNT_36K_BRAM=0,C_COUNT_18K_BRAM=1,C_EST_POWER_SUMMARY=Estimated Power for IP     _     2.048762 mW}";
 end iconROM;
 
 architecture STRUCTURE of iconROM is
@@ -411,6 +423,7 @@ U0: entity work.\iconROM_blk_mem_gen_v8_2__parameterized0\
     port map (
       addra(7 downto 0) => addra(7 downto 0),
       clka => clka,
-      douta(1 downto 0) => douta(1 downto 0)
+      douta(1 downto 0) => douta(1 downto 0),
+      ena => ena
     );
 end STRUCTURE;

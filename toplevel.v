@@ -53,9 +53,10 @@ module RoboCop_World (
 	
 	// parameter
 	parameter SIMULATE = 0;
-	localparam REZMULTIPLIER = 2;	//bit positions to shift the pixels to change resolution
-									// wold map is 128x128 so shift of two take it to 
-									// 512x512 {pixRow[7:0],{REZMULTIPLIER{1'b0}}}
+	localparam RESMOD  = 2;	// pixel multiplier
+							// used as shift on the pixel coordinates
+							// world map is 128x128 so shift of two takes it to 
+							// 512x512 PWL:{pixRow[7:0],{RESMOD{1'b0}}}
 
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -109,13 +110,13 @@ module RoboCop_World (
 
 	// System Level connections
 	wire			sysreset;
-	wire			sysclk;
+	//wire			sysclk;
 
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Global Assigns
 	///////////////////////////////////////////////////////////////////////////
-	assign sysclk = clk;
+	//assign sysclk = clk;
 
 	assign sysreset = !db_btns[0];			// Reset is active low!
 	assign kcpsm6_reset	= sysreset | rdl;
@@ -124,7 +125,7 @@ module RoboCop_World (
 	//assign pixRow = pixRow << 2;
 
 	// PWL DEBUG STUFF
-	assign JA[5:1] 	= {sysclk,Vsync,Hsync,vidOn,pixClock};
+	assign JA[5:1] 	= {2'b0,clk,Vsync,Hsync,vidOn,pixClock,1'b0};
 	 
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -134,7 +135,7 @@ module RoboCop_World (
 		.RESET_POLARITY_LOW(0),
 		.SIMULATE(SIMULATE))
 	DB (
-		.clk(sysclk),	
+		.clk(clk),	
 		.pbtn_in({btnC, btnL, btnU, btnR, btnD, btnCpuReset}),
 		.switch_in(sw),
 		.pbtn_db(db_btns),
@@ -166,7 +167,7 @@ module RoboCop_World (
 		.an(an),
 		
 		// clock and reset signals (100 MHz clock, active low reset)
-		.clk(sysclk),
+		.clk(clk),
 		.reset(sysreset),
 		
 		// ouput for simulation only
@@ -221,7 +222,7 @@ module RoboCop_World (
 		.Switch			(db_sw),		// debounced switches in from nexys4
 		
 		// System Interface
-		.clk			(sysclk),
+		.clk			(clk),
 		.rst			(sysreset));
 		
 		
@@ -240,14 +241,14 @@ module RoboCop_World (
 		.RMDist_reg		(rmdist),		// right motor distance register (DEPRICATED)
 						
 		// Interface to the video logic
-		// tied low for the demo (part1)
-		.vid_row		(pixRow),		// video logic row address
-		.vid_col		(pixCol),		// video logic column address
+		// RESMOD stretches the video b/c RojoBot World is only 128x128
+		.vid_row		(pixRow >> RESMOD),		// video logic row address
+		.vid_col		(pixCol >> RESMOD),		// video logic column address
 
 		.vid_pixel_out	(worldPix),		// pixel (location) value
 
 		// System Interface
-		.clk			(sysclk),		// system clock
+		.clk			(clk),		// system clock
 		.reset			(sysreset),	// system reset
 		.upd_sysregs	(upd_sysregs));	// flag from RojoBot to indicate that the system registers 
 										// (LocX, LocY, Sensors, BotInfo) have been updated
@@ -283,11 +284,11 @@ module RoboCop_World (
 		.interrupt_ack 	(interrupt_ack),
 		.reset 			(kcpsm6_reset),
 		.sleep			(kcpsm6_sleep),
-		.clk 			(sysclk)); 
+		.clk 			(clk)); 
 		
 	
 	///////////////////////////////////////////////////////////////////////////	
-	// Instantiate Demo BRAM (Code Store)
+	// Instantiate Code Store
 	///////////////////////////////////////////////////////////////////////////
 	proj2demo #(
 		.C_FAMILY				("7S"),   	// setting to '7S' since we are using a 7-series FPGA
@@ -298,16 +299,16 @@ module RoboCop_World (
 		.enable 		(bram_enable),
 		.address 		(address),
 		.instruction 	(instruction),
-		.clk 			(sysclk));
+		.clk 			(clk));
 	
 
 	///////////////////////////////////////////////////////////////////////////	
 	// Instantiate Pixel Clock
 	///////////////////////////////////////////////////////////////////////////
 	pixClock25	pixClock25 (
-		.clk_in1		(sysclk),
+		.clk_in1		(clk),
 		.clk_out1		(pixClock),
-		.locked			(),				// unused, leaving this float
+		.locked			(),				// unused, leaving this output float
 		.reset			(sysreset));
 	
 		
@@ -316,7 +317,7 @@ module RoboCop_World (
 	///////////////////////////////////////////////////////////////////////////
 	Colorizer #(/* mod takes no parameters */)
 	colorizer (
-		.clk			(sysclk),
+		.clk			(clk),
 		.worldIn		(worldPix),
 		.botIcon		(botIcon),
 		.enableVideo	(vidOn),
@@ -338,11 +339,11 @@ module RoboCop_World (
 
 
 	///////////////////////////////////////////////////////////////////////////	
-	// Instantiate Icon module
+	// Instantiate Icon module (it instantiates the Icon ROM)
 	///////////////////////////////////////////////////////////////////////////
 	icon #(/* module takes no parameters */)  
 	icon (
-		.clk		(sysclk),
+		.clk		(clk),
 		.pixCol		(pixCol),
 		.pixRow		(pixRow),
 		.locX		(locx),

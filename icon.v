@@ -36,8 +36,8 @@ module icon (
   ///////////////////////////////////////////////////////////////////////////
   // Internal Signals
   ///////////////////////////////////////////////////////////////////////////
-  reg	[3:0]	iconX;			// index into columns of icon pixelmap
-  reg	[3:0]	iconY;			// index into rows of icon pixelmap
+  reg	[3:0]	iconX;			// index into columns of icon pixelmap ROM
+  reg	[3:0]	iconY;			// index into rows of icon pixelmap ROM
   wire	[7:0]	iconTopLeft;	// Bounds of the icon 
   wire	[7:0]	iconTopRight;
   wire	[7:0]	iconBotLeft;
@@ -59,7 +59,8 @@ module icon (
   ///////////////////////////////////////////////////////////////////////////
   iconROM iconROM (
 	.clka	(clk),
-	.addra	({iconX,iconY}),
+	.ena	(1'b0),
+	.addra	(pixelAddress),
 	.douta	(pixelColor));
   
   
@@ -73,14 +74,19 @@ module icon (
   // Decide when to paint the botIcon
   // If (pixCol,pixRow) overlap (locX,locY) to (locX+15,locY+15)
   // Paint the Icon, otherwise paint "00" (transparency)
+  
+  
+  
+  ///PWL YOU HAVE THIS MATH WRONG THIS IS WHER YOU SHOULD BE LOOKING
   always @ (posedge clk) begin
 	if (pixCol >= iconTopLeft && pixCol <= iconTopRight &&
 		pixRow >= iconBotLeft && pixRow <= iconBotRight) begin
 		
-		botIcon <= pixelColor;
+		botIcon <= 2'b1/*pixelColor*/;
 	end
 	else begin
-		botIcon <= 2'b0;
+		botIcon <= 2'b0/*1;*/
+		
 	end
   end
 	  

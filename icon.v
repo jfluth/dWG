@@ -36,14 +36,14 @@ module icon (
   ///////////////////////////////////////////////////////////////////////////
   reg	[3:0]	iconX;			// index into columns of icon pixelmap ROM
   reg	[3:0]	iconY;			// index into rows of icon pixelmap ROM
-  wire	[7:0]	iconTopLeft;	// Bounds of the icon 
-  wire	[7:0]	iconTopRight;
-  wire	[7:0]	iconBotLeft;
-  wire	[7:0]	iconBotRight;
+  wire	[7:0]	iconLeft;	// Bounds of the icon 
+  wire	[7:0]	iconRight;
+  wire	[7:0]	iconTop;
+  wire	[7:0]	iconBottom;
   wire	[11:0]	pixelColor;		// Colour out from ROM
   reg	[8:0]	romAddress;		
-  wire	[9:0]	stretchLocX, stretchLocY;
-  
+  reg	[1023:0]	iconBitMap;
+  reg			redraw;	
   
   ///////////////////////////////////////////////////////////////////////////
   // Global Assigns
@@ -52,19 +52,59 @@ module icon (
   assign iconRight  = locX+10'd15;
   assign iconTop    = locY;
   assign iconBottom = locY+10'd15;
-  
-  // Stretch the world, man (map 128 world into 512 world
-  //assign stretchLocX = {locX,2'b0};
-  //assign stretchLocY = {locY,2'b0};
-  
+ /*  
+  initial begin
+	redraw = 1;
+  end */
+ /*  
+  always @ (posedge clk) begin
+    if (redraw) begin
+		iconBitMap <= {2'b00,2'b11,2'b00,2'b11,2'b00,2'b11,2'b00,2'b11,2'b01,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b11,2'b01,2'b01,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b11,2'b01,2'b01,2'b00,2'b00,2'b00,2'b00,2'b00,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b01,2'b01,2'b00,2'b00,2'b00,2'b00,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b01,2'b01,2'b00,2'b00,2'b00,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b10,2'b01,2'b01,2'b00,2'b00,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b10,2'b01,2'b01,2'b10,2'b00,
+					   2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b10,2'b01,2'b01,2'b01,2'b10,
+					   2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b10,2'b01,2'b01,2'b01,2'b10,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b10,2'b01,2'b01,2'b10,2'b00,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b10,2'b01,2'b01,2'b00,2'b00,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b01,2'b01,2'b00,2'b00,2'b00,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b01,2'b01,2'b00,2'b00,2'b00,2'b00,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b11,2'b01,2'b01,2'b00,2'b00,2'b00,2'b00,2'b00,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b11,2'b01,2'b01,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,
+					   2'b00,2'b11,2'b00,2'b11,2'b00,2'b11,2'b00,2'b11,2'b01,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b11,2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b01,2'b10,2'b10,
+					   2'b00,2'b00,2'b00,2'b00,2'b11,2'b00,2'b00,2'b00,2'b00,2'b10,2'b10,2'b01,2'b01,2'b10,2'b01,2'b10,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b10,2'b01,2'b10,2'b01,2'b10,2'b01,
+					   2'b00,2'b00,2'b11,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b10,2'b01,2'b10,2'b01,2'b01,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b10,2'b01,2'b10,2'b01,2'b01,2'b01,
+					   2'b11,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b10,2'b01,2'b10,2'b00,2'b10,2'b10,2'b01,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b10,2'b01,2'b10,2'b00,2'b00,2'b00,2'b10,2'b01,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b10,2'b01,2'b10,2'b00,2'b00,2'b00,2'b00,2'b00,2'b01,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b10,2'b01,2'b10,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b01,
+					   2'b00,2'b00,2'b00,2'b00,2'b00,2'b10,2'b01,2'b10,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b01,
+					   2'b00,2'b00,2'b00,2'b00,2'b10,2'b01,2'b10,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b11,
+					   2'b00,2'b00,2'b00,2'b10,2'b01,2'b10,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b11,2'b00,
+					   2'b00,2'b00,2'b10,2'b01,2'b10,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,
+					   2'b00,2'b10,2'b01,2'b10,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b11,2'b00,2'b00,2'b00,
+					   2'b10,2'b01,2'b10,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,
+					   2'b01,2'b10,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b00,2'b11,2'b00,2'b00,2'b00,2'b00,2'b00};
+	end
+	redraw <= 1;
+  end */
+
+
+ 
   ///////////////////////////////////////////////////////////////////////////
   // Instantiate the Block ROM holding Icon
   ///////////////////////////////////////////////////////////////////////////
-  iconRom2 iconROM (
-	.clka	(clk),
-	.ena	(1'b0),				// Always enabled
-	.addra	(romAddress),
-	.douta	(pixelColor));
+//  iconRom2 iconROM (
+//	.clka	(clk),
+//	.ena	(1'b0),				// Always enabled
+//	.addra	(romAddress),
+//	.douta	(pixelColor));
   
   
   // Set index into icon ROM
@@ -79,20 +119,20 @@ module icon (
   // Paint the Icon, otherwise paint "00" (transparency)
   //PWL YOU HAVE THIS MATH WRONG THIS IS WHERE YOU SHOULD BE LOOKING
   always @ (posedge clk) begin
-	if (pixCol >= iconLeft && pixCol <= iconRight &&
+	 if (pixCol >= iconLeft && pixCol <= iconRight &&
 		pixRow >= iconTop  && pixRow <= iconBottom) begin
 		
-		romAddress <= {1'b0,iconY,iconX};	// index into rom
-		botIcon    <= pixelColor;			// paint that color
+		//romAddress <= {1'b0,iconY,iconX};	// index into rom */
+		botIcon    <= 12'b000000001111;			// paint that color
+		
 	end
 	else begin
-		romAddress <= 9'b0;					// reset index
-		botIcon    <= 12'b0;				// transparent
+		//romAddress <= 9'b0;					// reset index
+		botIcon    <= 12'b0;				// transparent 
 		
 	end
   end
 	  
-
 
 
 

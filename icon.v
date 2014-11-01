@@ -14,8 +14,6 @@
 // 
 //
 //
-// PWL TODO:	fix reset. invert the reset globally and change
-//				debounce and sevenseg to expect reset active high.
 //
 //////////////////////////////////////////////////////////////////////////////////
 module icon (
@@ -24,11 +22,11 @@ module icon (
   // Port Declarations
   ///////////////////////////////////////////////////////////////////////////
   input					clk,
-  input			[9:0]	pixCol,			// Current pixed getting drawn
+  input			[9:0]	pixCol,			// Current pixel getting drawn
   input			[9:0]	pixRow,
   input			[7:0]	locX,			// RoboCop's current location
   input			[7:0]	locY,			// top left corner
-
+  input			[7:0]	botInfo,
   output	reg	[11:0]	botIcon			// Colour that should be output
 );
 
@@ -36,14 +34,15 @@ module icon (
   ///////////////////////////////////////////////////////////////////////////
   // Internal Signals
   ///////////////////////////////////////////////////////////////////////////
-  //reg	[3:0]	iconX;			// index into columns of icon pixelmap ROM
-  //reg	[3:0]	iconY;			// index into rows of icon pixelmap ROM
+  reg	[3:0]	iconX;			// index into columns of icon pixelmap ROM
+  reg	[3:0]	iconY;			// index into rows of icon pixelmap ROM
   wire	[7:0]	iconTopLeft;	// Bounds of the icon 
   wire	[7:0]	iconTopRight;
   wire	[7:0]	iconBotLeft;
   wire	[7:0]	iconBotRight;
-  wire	[11:0]	pixelColor;
-  reg	[8:0]	romAddress;
+  wire	[11:0]	pixelColor;		// Colour out from ROM
+  reg	[8:0]	romAddress;		
+  wire	[9:0]	stretchLocX, stretchLocY;
   
   
   ///////////////////////////////////////////////////////////////////////////
@@ -54,6 +53,9 @@ module icon (
   assign iconTop    = locY;
   assign iconBottom = locY+10'd15;
   
+  // Stretch the world, man (map 128 world into 512 world
+  //assign stretchLocX = {locX,2'b0};
+  //assign stretchLocY = {locY,2'b0};
   
   ///////////////////////////////////////////////////////////////////////////
   // Instantiate the Block ROM holding Icon
@@ -64,13 +66,13 @@ module icon (
 	.addra	(romAddress),
 	.douta	(pixelColor));
   
-  /*
+  
   // Set index into icon ROM
   always @ (posedge clk) begin
-	iconX <= pixCol - iconX;
-	iconY <= pixRow - iconY;
+	iconX <= pixCol[3:0] - locX[3:0];
+	iconY <= pixRow[3:0] - locX[3:0];
   end
-  */
+  
  
   // Decide when to paint the botIcon
   // If (pixCol,pixRow) overlap (locX,locY) to (locX+15,locY+15)
@@ -80,12 +82,12 @@ module icon (
 	if (pixCol >= iconLeft && pixCol <= iconRight &&
 		pixRow >= iconTop  && pixRow <= iconBottom) begin
 		
-		romAddress <= {pixRow - locY, pixCol - locX};	// index into rom
-		botIcon    <= pixelColor;						// paint that color
+		romAddress <= {1'b0,iconY,iconX};	// index into rom
+		botIcon    <= pixelColor;			// paint that color
 	end
 	else begin
-		romAddress <= 9'b0;								// reset index
-		botIcon    <= 12'b0;							// transparent
+		romAddress <= 9'b0;					// reset index
+		botIcon    <= 12'b0;				// transparent
 		
 	end
   end

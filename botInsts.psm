@@ -318,6 +318,11 @@ CONSTANT 	ProxL,			02
 CONSTANT 	ProxR,			01
 
 CONSTANT 	fortyFive		2D
+CONSTANT    oneThreeFive	87
+
+CONSTANT 	operation 		07
+
+
 
 ; ===============
 ; === main()  ===
@@ -563,50 +568,9 @@ next_mvmt:		LOAD	s0,		Botinf				; s0[3:0] = Botinf[7:4]
 				SR0	s0								;
 				SR0	s0								;
 				SR0	s0								;
-
-				CALL 	inFromProxSensors			; read the prox sensors
-				CALL 	inFromBLSensors				; read the black line sensors
-				COMPARE	BLValue, 	BLLine 			; check to see if bot in on a black line == 3'b000
-				JUMP 	NZ, 		noLine 			; if not jump to noLine 
-
-onLine:			COMPARE ProxValue,	ProxLR			; check to see if bot is at a wall
-				JUMP 	Z, 			hitWall			; if so jump to hitWall
-				;LOAD 	s0, 		SP_LFRF 		; load a forward motion
-				;OUTPUT s0, 		PA_MOTCTL_IN_ALT; power the motors
-				;RETURN 							;
 				CALL	mvmt2cc 					;
 				STORE	s1,		SP_DIG4 			;
 				RETURN								; return
-				
-noLine:			COMPARE	BLValue, BLRight 			; check if the black line is to the right
-				JUMP 	Z, 		turn_right 			; if so, turn right
-
-				COMPARE	BLValue, BLLeft 			; check if the black line is to the left
-				JUMP 	Z, 		turn_right 			; if so, turn left
-
-				COMPARE	BLValue, BLNone 			; check if the black line is gone
-				JUMP 	Z, 		turn_right 			; if so, reverse back to it
-
-;turn_left:											; consider one turning routine
-													;read motors
-													;set the turn speed
-													;turn 45 degrees
-													;LOAD 	 s0, 	SP_LSRF
-													;OUTPUT  s0, 	PA_MOTCTL_IN
-													;COMPARE s0, 	2D
-													;JUMP
-													;RETURN
-
-turn_right:		ADD 	s0, 	2D
-				CALL	mvmt2cc 					;
-				STORE	s1,		SP_DIG4 			;
-				RETURN
-
-;reverse_one:										;LOAD 	s0, 	SP_LRRR
-													;OUTPUT s0, 	PA_MOTCTL_IN		
-													;JUMP 	turn_right
-
-;hitWall:											end of road -- you win
 
 
 ; ==============================================================================
@@ -716,37 +680,75 @@ next_loc:		LOAD		s0,		LocX				; Dig[3:2] gets X-coordinate
 next_step:		LOAD 	s0, MV_STOP
 				OUTPUT 	s0, PA_MOTCTL_IN
 
-read_environ:	CALL 	inFromProxSensors			; read the prox sensors
+				CALL 	inFromProxSensors			; read the prox sensors
 				CALL 	inFromBLSensors				; read the black line sensors
-				COMPARE	BLValue, 	BLLine 			; check to see if bot in on a black line == 3'b000
-				JUMP 	NZ, 		reverse_to_bl
 
-				COMPARE ProxValue,	ProxLR			; check to see if bot is at a wall
-				JUMP 	Z, 			reverse_to_bl	; 
+				FETCH 	s2, 		opertion	
+				COMPARE s2, 		MV_FWD
+				JUMP 	Z, 			move_forward 
 
-move_forward:	LOAD 	s0, 		SP_LFRF
+				COMPARE s2,			MV_REV
+				JUMP 	Z, 			reverse_to_bl
+				
+				COMPARE s2, 		MV_SRT
+				JUMP 	Z, 			turn_right_45
+;=============================================================================================================
+;=============================================================================================================
+move_forward:	COMPARE	BLValue, 	BLLine 			; check to see if bot in on a black line == 3'b000
+				JUMP 	Z, 			checkProx
+				STORE   MV_REV, 	operation
+				RETURN
+
+checkProx:		COMPARE ProxValue,	ProxLR			; check to see if bot is at a wall
+				JUMP 	NZ, 		stay_forward	;
+				STORE  	MV_SRT, 	operation 
+				RETURN
+				
+stay_forward:	STORE   MV_FWD, 	operation
+				LOAD 	s0, 		SP_LFRF
 				OUTPUT	s0,			PA_MOTCTL_IN
-				JUMP 	stop
+				JUMP 	finish
+;=============================================================================================================
+;=============================================================================================================
+reverse_to_bl:	COMPARE	BLValue, 	BLLine 			; check to see if bot in on a black line == 3'b000
+				JUMP 	NZ, 		stay_reverse
+				STORE   MV_SRT, 	operation
+				RETURN
 
-reverse_to_bl:	CALL 	inFromBLSensors
-				COMPARE	BLValue, 	BLLine
-				JUMP 	Z,			turn_right_45
+;checkProx:		COMPARE ProxValue,	ProxLR			; check to see if bot is at a wall
+;				JUMP 	NZ, 		stay_forward	;
+;				STORE  	MV_SRT, 	operation 
+;				RETURN
+
+stay_reverse:	STORE   MV_REV, 	operation
 				LOAD 	s0, 		SP_LRRR
 				OUTPUT	s0,			PA_MOTCTL_IN
-				JUMP 	reverse_to_bl
-
+				JUMP 	finish
+;=============================================================================================================
+;=============================================================================================================
 turn_right_45:	LOAD	s0,			Botinf
 				AND		s0,			MSKORIENT
-				LOAD 	s1, 		s0	
+				FETCH 	s1, 		SP_OLDHDG
 				ADD 	s1, 		fortyFive
-keep_turning:	COMPARE	s1, 		s0
-				JUMP 	Z,			stop
+				COMPARE	s1, 		s0
+				JUMP 	Z,			keep_turning
+				STORE   MV_FWD, 	operation
+				JUMP 	finish
+
+keep_turning:	STORE   MV_SRT, 	operation
 				LOAD 	s0, 		SP_LFRS
 				OUTPUT	s0,			PA_MOTCTL_IN		
-				JUMP 	keep_turning
-
-stop:			LOAD 	s0, MV_STOP
-				OUTPUT 	s0, PA_MOTCTL_IN
+				RETURN
+;=============================================================================================================
+;=============================================================================================================
+stop:			LOAD 	s0, 		MV_STOP
+				OUTPUT 	s0, 		PA_MOTCTL_IN
+				RETURN
+;=============================================================================================================
+;=============================================================================================================				
+finish:			LOAD 	s0, 		Botinf
+				AND		s0,			MSKORIENT
+				STORE 	s0, 		SP_OLDHDG
 				RETURN
 
 				

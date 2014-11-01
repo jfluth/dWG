@@ -290,7 +290,7 @@ module RoboCop_World (
 	///////////////////////////////////////////////////////////////////////////	
 	// Instantiate Code Store
 	///////////////////////////////////////////////////////////////////////////
-	proj2demo #(
+	botInsts #(
 		.C_FAMILY				("7S"),   	// setting to '7S' since we are using a 7-series FPGA
 		.C_RAM_SIZE_KWORDS		(2),     	//Program size '1', '2' or '4'
 		.C_JTAG_LOADER_ENABLE	(1'b0))    	//PWL: I set this to zero PWL.....................Include JTAG Loader when set to 1'b1 
@@ -344,8 +344,8 @@ module RoboCop_World (
 	icon #(/* module takes no parameters */)  
 	icon (
 		.clk		(clk),
-		.pixCol		(pixCol/* >>RESMOD */),
-		.pixRow		(pixRow/* >>RESMOD */),
+		.pixCol		(pixCol>>RESMOD),
+		.pixRow		(pixRow>>RESMOD),
 		.locX		(locx),
 		.locY		(locy),
 		.botIcon	(botIcon));

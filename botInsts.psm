@@ -321,6 +321,7 @@ CONSTANT 	fortyFive,		2D
 CONSTANT    oneThreeFive,	87
 
 CONSTANT 	operation, 		0A
+CONSTANT 	turnCount, 		09
 
 
 
@@ -336,6 +337,11 @@ ADDRESS	000
 													;
 main:			LOAD 	s0, 		MV_FWD
 				STORE   s0, 		operation
+
+				LOAD	s0,			Botinf
+				AND		s0,			MSKORIENT
+				STORE 	s0, 		SP_OLDHDG	
+
 				CALL	init_btnluptbl				; initialize button to MotCtl lookup table
 				CALL	init_mvmttbl				; initialize movement to character code lookup table
 				LOAD	s1,		00					; clear the semaphore
@@ -685,7 +691,11 @@ next_step:		LOAD 	s0, MV_STOP
 				CALL 	inFromProxSensors			; read the prox sensors
 				CALL 	inFromBLSensors				; read the black line sensors
 
-				FETCH 	s2, 		operation	
+				FETCH 	s2, 		operation
+
+				COMPARE s2, 		MV_STOP
+				JUMP 	Z, 			move_stop 
+
 				COMPARE s2, 		MV_FWD
 				JUMP 	Z, 			move_forward 
 
@@ -696,7 +706,9 @@ next_step:		LOAD 	s0, MV_STOP
 				JUMP 	Z, 			turn_right_45
 ;=============================================================================================================
 ;=============================================================================================================
-move_forward:	COMPARE	s3, 		BLLine 			; check to see if bot in on a black line == 3'b000
+move_forward:	LOAD 	s0, 		00
+				STORE 	s0, 		turnCount
+				COMPARE	s3, 		BLLine 			; check to see if bot in on a black line == 3'b000
 				JUMP 	Z, 			checkProx
 				LOAD 	s0, 		MV_REV
 				STORE   s0, 		operation
@@ -737,11 +749,18 @@ stay_reverse:	LOAD 	s0, 		MV_REV
 turn_right_45:	LOAD	s0,			Botinf
 				AND		s0,			MSKORIENT
 				FETCH 	s1, 		SP_OLDHDG
-				ADD 	s1, 		fortyFive
 				COMPARE	s1, 		s0
 				JUMP 	Z,			keep_turning
+
 				LOAD 	s0, 		MV_FWD
 				STORE   s0, 		operation
+
+				FETCH 	s0, 		turnCount
+				ADD 	s0, 		01
+				STORE 	s0, 		turnCount
+				COMPARE s0, 		08
+				JUMP 	Z, 			move_stop
+
 				JUMP 	finish
 
 keep_turning:	LOAD 	s0, 		MV_SRT
@@ -760,6 +779,11 @@ finish:			LOAD 	s0, 		Botinf
 				AND		s0,			MSKORIENT
 				STORE 	s0, 		SP_OLDHDG
 				RETURN
+
+move_stop:		LOAD 	s0, 		MV_STOP
+				OUTPUT 	s0, 		PA_MOTCTL_IN
+				LOAD 	s0, 		MV_STOP
+				STORE   s0, 		operation
 
 				
 ;*************************

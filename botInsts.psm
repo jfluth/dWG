@@ -321,7 +321,7 @@ CONSTANT 	fortyFive,		2D
 CONSTANT    oneThreeFive,	87
 
 CONSTANT 	operation, 		0A
-CONSTANT 	turnCount, 		09
+CONSTANT 	turnCount, 		0B
 
 
 
@@ -733,12 +733,6 @@ reverse_to_bl:	COMPARE	s3, 		BLLine 			; check to see if bot in on a black line 
 				STORE   s0, 		operation
 				RETURN
 
-;checkProx:		COMPARE s4,			ProxLR			; check to see if bot is at a wall
-;				JUMP 	NZ, 		stay_forward	;
-;				LOAD 	s0, 		MV_SRT
-				STORE   s0, 		operation 
-;				RETURN
-
 stay_reverse:	LOAD 	s0, 		MV_REV
 				STORE   s0, 		operation
 				LOAD 	s0, 		SP_LRRR
@@ -760,7 +754,8 @@ turn_right_45:	LOAD	s0,			Botinf
 				STORE 	s0, 		turnCount
 				COMPARE s0, 		08
 				JUMP 	Z, 			move_stop
-
+				COMPARE s0, 		04
+				JUMP 	Z, 			keep_turning
 				JUMP 	finish
 
 keep_turning:	LOAD 	s0, 		MV_SRT
@@ -768,6 +763,7 @@ keep_turning:	LOAD 	s0, 		MV_SRT
 				LOAD 	s0, 		SP_LFRS
 				OUTPUT	s0,			PA_MOTCTL_IN		
 				RETURN
+		
 ;=============================================================================================================
 ;=============================================================================================================
 stop:			LOAD 	s0, 		MV_STOP

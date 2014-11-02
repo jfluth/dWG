@@ -344,10 +344,10 @@ module RoboCop_World (
 	icon #(/* module takes no parameters */)  
 	icon (
 		.clk		(clk),
-		.pixCol		(pixCol /* >> RESMOD */),
-		.pixRow		(pixRow /* >> RESMOD */),
-
+		.pixCol		(pixCol),
+		.pixRow		(pixRow),
 		.locX		({locx, {RESMOD{1'b0}}}),
 		.locY		({locy, {RESMOD{1'b0}}}),
+		.botInfo	(botinfo),
 		.botIcon	(botIcon));
 endmodule

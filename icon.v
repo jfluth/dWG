@@ -35,7 +35,8 @@ module icon (
   // Internal Signals
   ///////////////////////////////////////////////////////////////////////////
   reg	[3:0]	romX, romY;		// index into icon pixelmap ROM
-  reg	[3:0]	centeredLocX, centeredLocY;	// adjustment to center bot on line
+  //reg	[3:0]	centeredLocX, centeredLocY;	// adjustment to center bot on line
+  //wire	[3:0]	stretchLocX, stretchLocY;
   wire	[9:0]	iconLeft;			// Bounds of the icon 
   wire	[9:0]	iconRight;
   wire	[9:0]	iconTop;
@@ -54,15 +55,57 @@ module icon (
   assign iconTop    = locY;
   assign iconBottom = locY+10'd15;
   
+  //assign strechLocX = {locX,2'b0};
+  //assign sretchLocY = {locY,2'b0};
+  
   
   
   
   // if at the edges don't adjust positions, otherwise center bot on line
-  always @(posedge clk) begin
-	centeredLocX <= (locX == 10'b0 || locX == 10'b0)?locX:locX - 10'd6;
-	centeredLocY <= (locY == 10'b0 || locY == 10'b0)?locY:locY - 10'd6;
+//  always @(posedge clk) begin
+//	centeredLocX <= (locX == 10'b0 || locX == 10'b0)?locX:locX - 10'd6;
+//	centeredLocY <= (locY == 10'b0 || locY == 10'b0)?locY:locY - 10'd6;
+//  end
+  
+
+
+ 
+  ///////////////////////////////////////////////////////////////////////////
+  // Instantiate the Block ROM holding Icon
+  ///////////////////////////////////////////////////////////////////////////
+  iconRom3 iconROM (
+	.clka	(clk),
+	.ena	(1'b0),				// Always enabled
+	.addra	(romAddress),
+	.douta	(pixelColor));
+  
+  
+  // Set index into icon ROM
+  always @ (posedge clk) begin
+	romX <= pixCol[3:0] - locX[3:0];
+	romY <= pixRow[3:0] - locY[3:0];
   end
   
+ 
+  // Decide when to paint the botIcon
+  // If (pixCol,pixRow) overlap (locX,locY) to (locX+15,locY+15)
+  // Paint the Icon, otherwise paint "00" (transparency)
+
+  always @ (posedge clk) begin
+	 if (pixCol >= iconLeft && pixCol <= iconRight &&
+		pixRow >= iconTop  && pixRow <= iconBottom) begin
+		
+		romAddress <= {1'b1,romY,romX};	// index into rom */
+		botIcon    <=  iconPixArray[{1'b0,romY,romX}];			// paint that color
+		
+	end
+	else begin
+		//romAddress <= 9'b0;					// reset index
+		botIcon    <= 12'b0;				// transparent 
+		
+	end
+  end
+	  
   initial begin
 	iconPixArray[0]   = 12'h000;
 	iconPixArray[1]   = 12'hA30;
@@ -577,45 +620,6 @@ module icon (
 	iconPixArray[510] = 12'h000;
 	iconPixArray[511] = 12'h000;
   end
-
-
- 
-  ///////////////////////////////////////////////////////////////////////////
-  // Instantiate the Block ROM holding Icon
-  ///////////////////////////////////////////////////////////////////////////
-  iconRom3 iconROM (
-	.clka	(clk),
-	.ena	(1'b0),				// Always enabled
-	.addra	(romAddress),
-	.douta	(pixelColor));
-  
-  
-  // Set index into icon ROM
-  always @ (posedge clk) begin
-	romX <= pixCol[3:0] - locX[3:0];
-	romY <= pixRow[3:0] - locX[3:0];
-  end
-  
- 
-  // Decide when to paint the botIcon
-  // If (pixCol,pixRow) overlap (locX,locY) to (locX+15,locY+15)
-  // Paint the Icon, otherwise paint "00" (transparency)
-  //PWL YOU HAVE THIS MATH WRONG THIS IS WHERE YOU SHOULD BE LOOKING
-  always @ (posedge clk) begin
-	 if (pixCol >= iconLeft && pixCol <= iconRight &&
-		pixRow >= iconTop  && pixRow <= iconBottom) begin
-		
-		romAddress <= {1'b0,romY,romX};	// index into rom */
-		botIcon    <=  iconPixArray[{1'b0,romY,romX}];			// paint that color
-		
-	end
-	else begin
-		//romAddress <= 9'b0;					// reset index
-		botIcon    <= 12'b0;				// transparent 
-		
-	end
-  end
-	  
 
 
 

@@ -88,11 +88,11 @@ module icon (
   ///////////////////////////////////////////////////////////////////////////
   // Instantiate the Block ROM holding Icon
   ///////////////////////////////////////////////////////////////////////////
-  iconRom3 iconROM (
+  /*iconRom iconROM (
 	.clka	(clk),
 	.ena	(1'b0),				// Always enabled
 	.addra	(romAddress),
-	.douta	(pixelColor));
+	.douta	(pixelColor));*/
   
   
   // Set index into icon ROM

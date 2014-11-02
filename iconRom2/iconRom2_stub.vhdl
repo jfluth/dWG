@@ -1,16 +1,9 @@
 -- Copyright 1986-2014 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2014.3 (win64) Build 1034051 Fri Oct  3 17:14:12 MDT 2014
-<<<<<<< HEAD
--- Date        : Sat Nov 01 11:09:06 2014
+-- Date        : Sat Nov 01 14:40:21 2014
 -- Host        : IPA running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode synth_stub {C:/Users/pwl/Git Repos/540/proj2_src/iconRom2/iconRom2_stub.vhdl}
-=======
--- Date        : Sat Nov 01 11:01:35 2014
--- Host        : WIN-T31R621Q7K3 running 64-bit major release  (build 9200)
--- Command     : write_vhdl -force -mode synth_stub
---               C:/Users/Jordan/Documents/GitHub/drunkenWhiteGirls/iconRom2/iconRom2_stub.vhdl
->>>>>>> 876b950adf260249ccb401c83adf63b91ec8f02e
 -- Design      : iconRom2
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xc7a100tcsg324-1

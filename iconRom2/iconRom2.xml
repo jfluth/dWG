@@ -875,11 +875,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>customizationCRC</spirit:name>
-<<<<<<< HEAD
-            <spirit:value>f376cff5</spirit:value>
-=======
-            <spirit:value>44827f19</spirit:value>
->>>>>>> 876b950adf260249ccb401c83adf63b91ec8f02e
+            <spirit:value>c30eb2a9</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>customizationCRCversion</spirit:name>
@@ -887,11 +883,7 @@
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-<<<<<<< HEAD
-            <spirit:value>Sat Nov 01 18:07:23 UTC 2014</spirit:value>
-=======
-            <spirit:value>Sat Nov 01 17:59:01 UTC 2014</spirit:value>
->>>>>>> 876b950adf260249ccb401c83adf63b91ec8f02e
+            <spirit:value>Sat Nov 01 21:38:37 UTC 2014</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>StaleAtRelink</spirit:name>
@@ -910,11 +902,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>customizationCRC</spirit:name>
-<<<<<<< HEAD
-            <spirit:value>f376cff5</spirit:value>
-=======
-            <spirit:value>44827f19</spirit:value>
->>>>>>> 876b950adf260249ccb401c83adf63b91ec8f02e
+            <spirit:value>c30eb2a9</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>customizationCRCversion</spirit:name>
@@ -922,11 +910,7 @@
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-<<<<<<< HEAD
-            <spirit:value>Sat Nov 01 18:07:23 UTC 2014</spirit:value>
-=======
-            <spirit:value>Sat Nov 01 17:59:01 UTC 2014</spirit:value>
->>>>>>> 876b950adf260249ccb401c83adf63b91ec8f02e
+            <spirit:value>Sat Nov 01 21:38:37 UTC 2014</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>StaleAtRelink</spirit:name>
@@ -944,11 +928,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>customizationCRC</spirit:name>
-<<<<<<< HEAD
-            <spirit:value>f376cff5</spirit:value>
-=======
-            <spirit:value>44827f19</spirit:value>
->>>>>>> 876b950adf260249ccb401c83adf63b91ec8f02e
+            <spirit:value>c30eb2a9</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>customizationCRCversion</spirit:name>

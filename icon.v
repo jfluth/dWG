@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+:`timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // filename:	icon.v
 //
@@ -645,6 +645,7 @@ module icon (
 	iconPixArray[509] = 12'hf00;
 	iconPixArray[510] = 12'hf00;
 	iconPixArray[511] = 12'hf00;
+<<<<<<< HEAD
  */                 
                  
 

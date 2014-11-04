@@ -1,6 +1,25 @@
-// filename nexus4_bot_if.v
-// Paul and Jordans Project
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+//	filename nexus4_bot_if.v
 //
+//	ECE 540 Project 2: RojoBot World
+//	
+//	Jordan Fluth <jfluth@gmail.com>
+//	Paul Long <pwl@pdx.edu>
+//	
+//	22 October 2014
+//	
+//	Description:
+//		This block is the interface between the botsim IP and the RoboCop
+//		picoblaze line follower IP. It also handles driving the seven segment
+//		displays and LEDs. It also implements the interrupt controller
+//	
+//	General Operation:
+//		The block operates as a big mux/demux. Port addresse are decoded
+//		and the data is transfered to the proper place
+//	
+//////////////////////////////////////////////////////////////////////////////////	
+
 
 module  nexys4_bot_if (
 
@@ -50,11 +69,9 @@ module  nexys4_bot_if (
 										// Button[{left,up,right,down}]
 	input		[15:0]	Switch			// Debounced switches in from nexys4
 );
-/////////////////////////
-// End Port Definitions	
-/////////////////////////
+
 	`include "proj2Header.vh"			
-	//wire reset = RESET_POLARITY_LOW ? ~rst : rst;			
+		
     
     initial begin 
         DP_h <= 4'd0;
@@ -69,13 +86,13 @@ module  nexys4_bot_if (
 			// In from Rojobot
 			// Keeping  original and _ALT port address to maintain
 			// backwards compatibility with Nexys3
-			PA_LOCX:		DataOut <= LocX;
+			PA_LOCX:		DataOut <= LocX;			// botsim Location CSR
 			PA_LOCX_ALT:	DataOut <= LocX;
 			PA_LOCY:		DataOut <= LocY;
 			PA_LOCY_ALT:	DataOut <= LocY;
-			PA_BOTINFO:		DataOut <= BotInfo;
+			PA_BOTINFO:		DataOut <= BotInfo;			// botsim Heading CSR
 			PA_BOTINFO_ALT:	DataOut <= BotInfo;
-			PA_SENSORS:		DataOut <= Sensors;
+			PA_SENSORS:		DataOut <= Sensors;			// botsim Sensor CSR
 			PA_SENSORS_ALT:	DataOut <= Sensors;
 			PA_LMDIST:		DataOut <= LMDist;			// Deprecated, include for completeness
 			PA_LMDIST_ALT:	DataOut <= LMDist;			// IBID
@@ -96,49 +113,30 @@ module  nexys4_bot_if (
 	// Incoming to I/O block
 	always @(posedge clk /*or negedge rst*/) begin
 
-		
-	  //Dig0 <= 8'd16;
-		/*if (!rst) begin // see comment above re: agnostic wrt: reste active high/low
-			// Blank 7-Seg Displays
-			Dig0 <= CC_SPACE;
-			Dig1 <= CC_SPACE;
-			Dig2 <= CC_SPACE;
-			Dig3 <= CC_SPACE;
-			Dig4 <= CC_SPACE;
-			Dig5 <= CC_SPACE;
-			Dig6 <= CC_SPACE;
-			Dig7 <= CC_SPACE;
-			
-			// Blank DPs
-			DP_l <= 4'b0;//PWL: These widths might be wrong, give this a look please!
-			DP_h <= 4'b0;
-		end
-		else begin*/
-			if (WriteStrobe) begin
-				case(PortID)// PWL: should I be switching on the low-order 5 bits to save a LUT6 on implementation
-					// Out to 7-seg Displays
-					PA_DIG7:	Dig7  <= DataIn;
-					PA_DIG6:	Dig6  <= DataIn;
-					PA_DIG5:	Dig5  <= DataIn;
-					PA_DIG4:	Dig4  <= DataIn;
-					PA_DIG3:	Dig3  <= DataIn;
-					PA_DIG2:	Dig2  <= DataIn;
-					PA_DIG1:	Dig1  <= DataIn;
-					PA_DIG0:	Dig0  <= DataIn;
-					PA_DP:		DP_l  <= DataIn;
-					PA_DP0704:	DP_h  <= DataIn;
-					
-					// Out to LED's
-					PA_LEDS:	 LED[7:0]  <= DataIn;
-					PA_LEDS1508: LED[15:8] <= DataIn;
-					
-					// Out to RojoBot
-					PA_MOTCTL_IN:	  MotCtl[7:0] <= DataIn;
-					PA_MOTCTL_IN_ALT: MotCtl[7:0] <= DataIn;
+		if (WriteStrobe) begin
+			case(PortID)// PWL: should I be switching on the low-order 5 bits to save a LUT6 on implementation
+				// Out to 7-seg Displays
+				PA_DIG7:	Dig7  <= DataIn;
+				PA_DIG6:	Dig6  <= DataIn;
+				PA_DIG5:	Dig5  <= DataIn;
+				PA_DIG4:	Dig4  <= DataIn;
+				PA_DIG3:	Dig3  <= DataIn;
+				PA_DIG2:	Dig2  <= DataIn;
+				PA_DIG1:	Dig1  <= DataIn;
+				PA_DIG0:	Dig0  <= DataIn;
+				PA_DP:		DP_l  <= DataIn;
+				PA_DP0704:	DP_h  <= DataIn;
+				
+				// Out to LED's
+				PA_LEDS:	 LED[7:0]  <= DataIn;
+				PA_LEDS1508: LED[15:8] <= DataIn;
+				
+				// Out to RojoBot
+				PA_MOTCTL_IN:	  MotCtl[7:0] <= DataIn;
+				PA_MOTCTL_IN_ALT: MotCtl[7:0] <= DataIn;
 	
-					//default: ;// PWL: there is a lot more to do here, mister!
-				endcase
-			//end
+				//default: ;// PWL: there is a lot more to do here, mister!
+			endcase
 		end
 	end //always block
 		
@@ -151,8 +149,5 @@ module  nexys4_bot_if (
 		else
 			Interrupt <= Interrupt;
 	end
-	//always @(posedge clk) begin
-	//	Interrupt <= BotInterrupt; //PWL: this looks fishy, prolly need some wires
-	//end
-		
+
 endmodule

@@ -28,14 +28,21 @@ from PIL import Image
 
 def Convert (ImageName):
 	
-	# Open image
-	img = Image.open(ImageName)
+	# Open image, get a  45 deg version, shrink to 16x16
+	img   = Image.open(ImageName)
+	img45 = img.rotate(315)
+	img45 = img.resize((16,16),Image.ANTIALIAS)
+	img   = img.resize((16,16),Image.ANTIALIAS)
+
 	# Verify that the image is in the 'RGB' mode, every pixel is described by 
 	# three bytes
 	if img.mode != 'RGB':
 		img = img.convert('RGB')
-
+	if img45.mode != 'RGB':
+		img45 = img.convert('RGB')
+		
 	# Store Width and height of image
+	# Assuming bot images are same size
 	width 	= img.size[0]
 	height	= img.size[1]
 
@@ -47,69 +54,69 @@ def Convert (ImageName):
 	oFile.write('*****  Template file for the image array\n')
 	oFile.write('*****  Produced from {}\n'.format(ImageName))
 	oFile.write('***********************************************/\n\n')
-	oFile.write('reg	[11:0]	imageArray[{}:0];\n'.format(width * height * 2 - 1))
+	#oFile.write('reg	[11:0]	imageArray[{}:0];\n'.format(width * height * 2 - 1))
 	
 	# Grab the individual pixels and scale them down
 	# 
 
-	cnt = 256
-	for r in range(0, height):
-		for c in range(0, width):
-			# Check for IndexError, usually occurs if the script is trying to 
-			# access an element that does not exist
-			try:
-				R,G,B = img.getpixel((c,r))
-			except IndexError:
-				print 'Index Error Occurred At:'
-				print 'c: {}, r:{}'.format(c,r)
-				sys.exit()
-			# convert the value 
-			R = hex(R*15/255)[2:]
-			G = hex(G*15/255)[2:]
-			B = hex(B*15/255)[2:]
-			ColorValue = R+G+B
-			
-			# Check for Value Error, happened when the case of the pixel being 
-			# zero was not handled properly	
-			try:
-				oFile.write("iconPixArray[%d] = 12'h%3.2X;\n"%(cnt, int(ColorValue,16)))
-			except ValueError:
-				print 'Value Error Occurred At:'
-				print 'Contents of ColorValue: {0} at r:{1} c:{2}'.format(ColorValue,r,c)
-				print 'R:{0} G:{1} B{2}'.format(R,G,B)
-				print 'Rb:{0} Gb:{1} Bb:{2}'.format(Rb,Gb,Bb)
-				sys.exit()
-			cnt += 1
-	
 	cnt = 0
-	vert = img.rotate(45)
-	for r in range(0, height):
-		for c in range(0, width):
-			# Check for IndexError, usually occurs if the script is trying to 
-			# access an element that does not exist
-			try:
-				R,G,B = vert.getpixel((c,r))
-			except IndexError:
-				print 'Index Error Occurred At:'
-				print 'c: {}, r:{}'.format(c,r)
-				sys.exit()
-			# convert the value 
-			R = hex(R*15/255)[2:]
-			G = hex(G*15/255)[2:]
-			B = hex(B*15/255)[2:]
-			ColorValue = R+G+B
+	for i in range (['img','img45'])
+		for r in range(0, height):
+			for c in range(0, width):
+				# Check for IndexError, usually occurs if the script is trying to 
+				# access an element that does not exist
+				try:
+					R,G,B = img.getpixel((c,r))
+				except IndexError:
+					print 'Index Error Occurred At:'
+					print 'c: {}, r:{}'.format(c,r)
+					sys.exit()
+				# convert the value 
+				R = hex(R*15/255)[2:]
+				G = hex(G*15/255)[2:]
+				B = hex(B*15/255)[2:]
+				ColorValue = R+G+B
+				
+				# Check for Value Error, happened when the case of the pixel being 
+				# zero was not handled properly	
+				try:
+					oFile.write("iconPixArray[%d] = 12'h%3.2X;\n"%(cnt, int(ColorValue,16)))
+				except ValueError:
+					print 'Value Error Occurred At:'
+					print 'Contents of ColorValue: {0} at r:{1} c:{2}'.format(ColorValue,r,c)
+					print 'R:{0} G:{1} B{2}'.format(R,G,B)
+					print 'Rb:{0} Gb:{1} Bb:{2}'.format(Rb,Gb,Bb)
+					sys.exit()
+				cnt += 1
+	
+	
+	# for r in range(0, height):
+		# for c in range(0, width):
+			# # Check for IndexError, usually occurs if the script is trying to 
+			# # access an element that does not exist
+			# try:
+				# R,G,B = img45.getpixel((c,r))
+			# except IndexError:
+				# print 'Index Error Occurred At:'
+				# print 'c: {}, r:{}'.format(c,r)
+				# sys.exit()
+			# # convert the value 
+			# R = hex(R*15/255)[2:]
+			# G = hex(G*15/255)[2:]
+			# B = hex(B*15/255)[2:]
+			# ColorValue = R+G+B
 			
-			# Check for Value Error, happened when the case of the pixel being 
-			# zero was not handled properly	
-			try:
-				oFile.write("iconPixArray[%d] = 12'h%3.2X;\n"%(cnt, int(ColorValue,16)))
-			except ValueError:
-				print 'Value Error Occurred At:'
-				print 'Contents of ColorValue: {0} at r:{1} c:{2}'.format(ColorValue,r,c)
-				print 'R:{0} G:{1} B{2}'.format(R,G,B)
-				print 'Rb:{0} Gb:{1} Bb:{2}'.format(Rb,Gb,Bb)
-				sys.exit()
-			cnt += 1
+			# # Check for Value Error, happened when the case of the pixel being 
+			# # zero was not handled properly	
+			# try:
+				# oFile.write("iconPixArray[%d] = 12'h%3.2X;\n"%(cnt, int(ColorValue,16)))
+			# except ValueError:
+				# print 'Value Error Occurred At:'
+				# print 'Contents of ColorValue: {0} at r:{1} c:{2}'.format(ColorValue,r,c)
+				# print 'R:{0} G:{1} B{2}'.format(R,G,B)
+				# print 'Rb:{0} Gb:{1} Bb:{2}'.format(Rb,Gb,Bb)
+				# sys.exit()
+			# cnt += 1
 	
 	
 	oFile.close()

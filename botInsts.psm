@@ -674,12 +674,14 @@ next_loc:		LOAD		s0,		LocX				; Dig[3:2] gets X-coordinate
 				LOAD		Dig3,	s0					;
 				
 				LOAD		s0,		LocY				; Dig[1:0] gets Y-coordinate
+				FETCH s0, forwardFlag
 				LOAD		Dig0,	s0					; Digit 0 gets lower nibble
 				AND		Dig0,	MSK_HEXDIGIT		; 
 				SR0		s0							; Digit 1 gets upper nibble
 				SR0		s0							;
 				SR0		s0							;
 				SR0		s0
+				FETCH s0, turnCount
 				LOAD		Dig1,	s0					;
 				RETURN					
 
@@ -745,7 +747,7 @@ stay_forward:	FETCH 	s0, 		turnCount
 				ADD 	s0, 		01
 				STORE  	s0, 		forwardFlag
 
-				COMPARE s0, 		1F
+				COMPARE s0, 		07
 				JUMP 	NZ, 		finish
 				FETCH 	s0, 		turnCount
 				LOAD 	s0, 		00

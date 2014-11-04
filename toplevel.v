@@ -1,21 +1,21 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// filename:	toplevel.v
-//
-// ECE 540 Project 2: RojoBot World
-//
-// Jordan Fluth <jfluth@gmail.com>
-// Paul Long <pwl@pdx.edu>
-//
-// 25 October 2014
-//
-// Description:
-//
-// 
-//
-//
-// PWL TODO:	fix reset. invert the reset globally and change
-//				debounce and sevenseg to expect reset active high.
+//	filename:	toplevel.v
+//	
+//	ECE 540 Project 2: RojoBot World
+//	
+//	Jordan Fluth <jfluth@gmail.com>
+//	Paul Long <pwl@pdx.edu>
+//	
+//	25 October 2014
+//	
+//	Description:
+//		This is the top-level module it instantiates the required design modules
+//		and wires them up to each other and the outside world.
+//		The only real work being done here is coordinating the various reset levels
+//		and multiplying the appropriate signals to account for the botsim IP
+//		operating in 128x128 space and the display modules operationg in 512x512
+//		space.
 //
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -116,7 +116,6 @@ module RoboCop_World (
 	///////////////////////////////////////////////////////////////////////////
 	// Global Assigns
 	///////////////////////////////////////////////////////////////////////////
-	//assign sysclk = clk;
 
 	assign sysreset = !db_btns[0];			// Reset is active low!
 	assign kcpsm6_reset	= sysreset | rdl;
@@ -185,15 +184,15 @@ module RoboCop_World (
 		.DataIn			(out_port),		// Data						PB -> us
 		.DataOut		(in_port),		// Data						us -> PB
 	
-		.kWriteStrobe	(k_write_strobe),	// Constant write strobe	PB -> us
-		.WriteStrobe	(write_strobe),	// write strobe				PB -> us
+		.kWriteStrobe	(k_write_strobe),// Constant write strobe	PB -> us
+		.WriteStrobe	(write_strobe),	 // write strobe				PB -> us
 		.ReadStrobe		(read_strobe),
 	
 		.Interrupt		(interrupt),
 		.InterruptAck	(interrupt_ack),
 		
 		// bot interface
-		.MotCtl			(motctl),	// Instructions out to RojoBot
+		.MotCtl			(motctl),		// Instructions out to RojoBot
 		.LocX			(locx),			// Location in from RojoBot
 		.LocY			(locy),			// IBID
 		.BotInfo		(botinfo),		// in from RojoBot

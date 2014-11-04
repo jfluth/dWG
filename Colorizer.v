@@ -1,21 +1,18 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: Paul Long and Jordan Fluth
+//	filename:	Colorizer.v
+//
+//	ECE 540 Project2: RojoBot World
+//	
+//	Jordan Fluth <jfluth@gmail>
+//	Paul Long <pwl@pdx.edu>
 // 
-// Create Date: 10/25/2014 10:56:23 PM
-// Design Name: 
-// Module Name: Colorizer
-// Project Name: Project 2
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
+//	25 October 2014
+//	
+//	Description:
+//		In addition to various houskeeping signals (like clock), this module
+//		take in codes from the BotSim IP and from the Icon module that indicate
+//		the color that should be painted to the screen. It is basically a mux.
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -34,13 +31,7 @@ module Colorizer(
                 RED     = 12'b111100000000,
 				BLUE	= 12'b000000001111;
                 
-/*******************************************************************************
-    -- INSERT COMMENTS --
-*******************************************************************************/                
-    
-	
-	//assign botIcon = 2'b0; // Force for testing, not Icon Module yet :(
-	
+
 	always @ (posedge clk) begin
         if (~enableVideo) drawColor <= BLACK;		// if video is off show black
         else if (botIcon) drawColor <= botIcon;		// if botIcon is not transparent, draw it

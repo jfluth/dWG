@@ -20,6 +20,7 @@
 ;						Vivdao hardware manager (2014.2) pointed out by Ken Chapman.  The bug
 ;						corrupts location 3 of the ROM so the code is written to avoid that location
 ; 12-Oct-14		RK		Modified code to take advantage of the 8 digit Nexys4 (vs. 4 on the Nexys3) display
+; 02-Nov-14		JF		Added line following algorithm
 ;
 ; Description:
 ; ============
@@ -28,14 +29,7 @@
 ; on the full Rojobot emulator (as implemented in bot.v instead of the simplified
 ; Rojobot model used in the Getting Started project
 ;
-; The demo uses the 4 pushbuttons to control the Rojobot as follows:
-;	btn_left	- Left Motor forward
-; 	btn_up		- Left Motor reverse
-;	btn_right	- Right Motor forward
-;	btn_down	- Right Motor reverse
-; If neither of the two buttons that control each motor is pushed, then the motor is stopped. 
-; If both of the two buttons that control each motor are pushed, the actions cancel each other
-; leaving the motor stopped.
+; This program reads the sensor data and follows a black line accordingly.
 ;
 ; The demo takes advantage of the wider display on the Nexys4 (8 digits vs. 4) to
 ; make the rojobot state easier for follow. The digits are mapped as follows:
@@ -50,9 +44,6 @@
 ; The sensors are displayed on the LEDs in both display modes.
 ; Decimal point 0 toggles on and off every interrupt (~every 100 msec w/ updt_sysregs)
 ;
-; NOTE:  NOT ALL THE CODE IN THIS EXAMPLE IS USED.  THE EXAMPLE WAS CREATED TO GIVE YOU, THE
-; STUDENT, AN EXAMPLE OF HOW TO CONTROL THE ROJOBOT AND NEXYS4 PERIPHERALS FROM AN EMBEDDED PICOBLAZE
-; CPU. YOU MAY (OR NOT) FIND SOME OF THIS CODE APPLICABLE TO YOUR OTHER PROJECTS
 ;
 ; -----------------------------------------------------------------	
 
@@ -336,18 +327,18 @@ ADDRESS	000
 				JUMP	main						; Ken Chapman and is known to be in 2014.2
 				JUMP	main						; Address 003 can be corrupted by Vivado HW manager
 													;
-main:			LOAD 	s0, 		MV_FWD
+main:			LOAD 	s0, 		MV_FWD			; set the initial motion to forward
 				STORE   s0, 		operation
 
-				FETCH 	s0, 		turnCount
+				FETCH 	s0, 		turnCount		; initialize turnCount to zero
 				LOAD 	s0, 		00
 				STORE   s0, 		turnCount
 
-				FETCH 	s0, 		forwardFlag
+				FETCH 	s0, 		forwardFlag 	; initialize forwardFlag to zero
 				LOAD 	s0, 		00
 				STORE   s0, 		forwardFlag
 
-				LOAD	s0,			Botinf
+				LOAD	s0,			Botinf 			; initilize the old heading to the bots current heading
 				AND		s0,			MSKORIENT
 				STORE 	s0, 		SP_OLDHDG	
 
@@ -571,10 +562,6 @@ mvmt2cc:		LOAD	s2,		SP_MVMTBASE			; s2 gets base of movment conversion table
 				RETURN															
 
 				
-;#########################################
-; Modify this function for Project 2 #####	
-;#########################################			
-			
 ; ========================================================================
 ; === next_mvmt() - Calculate  digit for motion indicator              ===
 ; === Registers affected: Dig3, s0                                     ===
@@ -681,12 +668,7 @@ next_loc:		LOAD		s0,		LocX				; Dig[3:2] gets X-coordinate
 				SR0		s0							;
 				SR0		s0
 				LOAD		Dig1,	s0					;
-				RETURN					
-
-
-;#########################################
-; Modify this function for Project 2 #####	
-;#########################################					
+				RETURN								
 
 ; ==============================================================================
 ; === next_step() - Tells rojobot what to do next                            ===    
@@ -715,6 +697,10 @@ next_step:		LOAD 	s0, MV_STOP
 				COMPARE s2, 		MV_SRT
 				JUMP 	Z, 			turn_right_45
 ;=============================================================================================================
+; To go forward you first need to check that you are still on a black line, if not reverse, if yes then check
+; the proximity sensors. If you are at a wall turn right 45 degress. If not, check if you have turned 180 
+; degrees, if you have make a right turn. If not, set operation to forward, signal the wheels to move forward,  
+; and increase the forwardFlag. If the forward flag is egual to 10'h then reset the turn count and return.
 ;=============================================================================================================
 move_forward:	LOAD	s0, 		Sensor
 				AND 	s0, 		BLMask
@@ -745,13 +731,15 @@ stay_forward:	FETCH 	s0, 		turnCount
 				ADD 	s0, 		01
 				STORE  	s0, 		forwardFlag
 
-				COMPARE s0, 		0F
+				COMPARE s0, 		10
 				JUMP 	NZ, 		finish
 				FETCH 	s0, 		turnCount
 				LOAD 	s0, 		00
 				STORE   s0, 		turnCount
 				JUMP 	finish
 ;=============================================================================================================
+; Check that you are not on the black line, if not set operation to right turn and return. If yes, set 
+; operation to reverse and signal the wheel to turn backward.
 ;=============================================================================================================
 reverse_to_bl:	LOAD	s0, 		Sensor
 				AND 	s0, 		BLMask
@@ -768,6 +756,11 @@ stay_reverse:	LOAD 	s0, 		MV_REV
 				OUTPUT	s0,			PA_MOTCTL_IN
 				JUMP 	finish
 ;=============================================================================================================
+; Check that the old heading and the new heading are not the same. If they are, increment turn count, set  
+; operation to forward and return. If not, set operation to right turn, signal the wheel to make a slow right 
+; turn and return.
+; The skip turn label is used to for another turn when the bot has turned 180 degrees from its original 
+; heading.
 ;=============================================================================================================
 turn_right_45:	LOAD	s0,			Botinf
 				AND		s0,			MSKORIENT
@@ -791,28 +784,32 @@ keep_turning:	LOAD 	s0, 		MV_SRT
 
 skip_turn:		LOAD 	s0, 		MV_SRT
 				STORE 	s0, 		operation
-				FETCH 	s0, 		turnCount
-				LOAD 	s0, 		00
-				STORE   s0, 		turnCount
+				;FETCH 	s0, 		turnCount
+				;LOAD 	s0, 		00
+				;STORE   s0, 		turnCount
 				RETURN
 
 ;=============================================================================================================
+; stop the motors and return.
 ;=============================================================================================================
 stop:			LOAD 	s0, 		MV_STOP
 				OUTPUT 	s0, 		PA_MOTCTL_IN
 				RETURN
 ;=============================================================================================================
+; store the current heading in the old heading scrath pad register and return.
 ;=============================================================================================================				
 finish:			LOAD 	s0, 		Botinf
 				AND		s0,			MSKORIENT
 				STORE 	s0, 		SP_OLDHDG
 				RETURN
-
+;=============================================================================================================
+; stop the motors, set operation to stop and return.
+;=============================================================================================================
 move_stop:		LOAD 	s0, 		MV_STOP
 				OUTPUT 	s0, 		PA_MOTCTL_IN
 				LOAD 	s0, 		MV_STOP
 				STORE   s0, 		operation
-				JUMP move_stop
+				RETURN
 
 				
 ;*************************
@@ -833,9 +830,9 @@ move_stop:		LOAD 	s0, 		MV_STOP
 ;
 ; Registers used s0
 ;---------------------
-DEB_rdbtns:		INPUT		s0,		PA_PBTNS			; read the buttons
-				AND		s0,		MSK_ALLBTNS			; mask out unused bits
-				RETURN								; and return
+;DEB_rdbtns:	INPUT		s0,		PA_PBTNS			; read the buttons
+;				AND		s0,		MSK_ALLBTNS			; mask out unused bits
+;				RETURN								; and return
 				
 				
 ;---------------------
@@ -852,9 +849,9 @@ DEB_rdbtns:		INPUT		s0,		PA_PBTNS			; read the buttons
 ;
 ; Registers used s0
 ;---------------------
-DEB_rdsw:		INPUT		s0,		PA_SLSWTCH			; read the slide switches
-				AND		s0,		MSK_ALLSW_LO	 	; mask out unused bits
-				RETURN								; and return				
+;DEB_rdsw:		INPUT		s0,		PA_SLSWTCH			; read the slide switches
+;				AND		s0,		MSK_ALLSW_LO	 	; mask out unused bits
+;				RETURN								; and return				
 
 				
 ;---------------------
@@ -871,9 +868,9 @@ DEB_rdsw:		INPUT		s0,		PA_SLSWTCH			; read the slide switches
 ;
 ; Registers used s0
 ;---------------------
-DEB_rdsw_hi:	INPUT		s0,		PA_SLSWTCH1508		; read the slide switches
-				AND		s0,		MSK_ALLSW_HI	 	; mask out unused bits
-				RETURN								; and return	
+;DEB_rdsw_hi:	INPUT		s0,		PA_SLSWTCH1508		; read the slide switches
+;				AND		s0,		MSK_ALLSW_HI	 	; mask out unused bits
+;				RETURN								; and return	
 								
 ;---------------------
 ; LED_wrleds() - Write the low order 8 LEDs

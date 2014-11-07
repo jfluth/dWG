@@ -342,7 +342,6 @@ main:			LOAD 	s0, 		MV_FWD			; set the initial motion to forward
 				AND		s0,			MSKORIENT
 				STORE 	s0, 		SP_OLDHDG	
 
-				CALL	init_btnluptbl				; initialize button to MotCtl lookup table
 				CALL	init_mvmttbl				; initialize movement to character code lookup table
 				LOAD	s1,		00					; clear the semaphore
 				STORE	s1,		SP_SEM				;
@@ -374,9 +373,7 @@ main_L2:		CALL	wr_alldigits				;		write all of the digits to the display
 				STORE	s6,		SP_SEM				;
 				JUMP	main_L0						;	} // end - main while loop	
 				
-													
-								
-			
+																
 ;**************************************************************************************
 ; Support functions
 ;**************************************************************************************	
@@ -415,80 +412,6 @@ wr_alldigits:										; Digits 0 to 3 are stored in registers
 				LOAD	s2,			07				; point at digit 7
 				FETCH	s1,			SP_DIG7			; and write it to the display
 				CALL	SS_wrdigx_hi				;				
-				RETURN
-				
-					
-;*******
-; Functions to convert pushbutton presses to Motor Control input
-;*******				
-
-; ===============================================================================
-; === init_btnluptbl() - initialize button translation lookup table in SP RAM ===
-; === Registers affected: s0, s1                                              ===
-; ===============================================================================
-init_btnluptbl:	LOAD	s0,		SP_BTNBASE			; s0 gets base of button translation lookup table
-				LOAD	s1,		SP_LSRS				; s1 gets values for 0x00								
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index
-				LOAD	s1,		SP_LORR				; s1 gets values for 0x01								
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index				
-				LOAD	s1,		SP_LSRF				; s1 gets values for 0x02								
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index
-				LOAD	s1,		SP_LSRFR			; s1 gets values for 0x03								
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index	
-				LOAD	s1,		SP_LRRS				; s1 gets values for 0x04								
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index
-				LOAD	s1,		SP_LRRR				; s1 gets values for 0x05							
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index				
-				LOAD	s1,		SP_LRRF				; s1 gets values for 0x06								
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index
-				LOAD	s1,		SP_LRRFR			; s1 gets values for 0x07								
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index
-				LOAD	s1,		SP_LFRS				; s1 gets values for 0x08								
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index
-				LOAD	s1,		SP_LFRR				; s1 gets values for 0x09								
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index				
-				LOAD	s1,		SP_LFRF				; s1 gets values for 0x0A								
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index
-				LOAD	s1,		SP_LFRFR			; s1 gets values for 0x0B								
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index	
-				LOAD	s1,		SP_LFRRS			; s1 gets values for 0x0C								
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index
-				LOAD	s1,		SP_LFRRR			; s1 gets values for 0x0D							
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index				
-				LOAD	s1,		SP_LFRRF			; s1 gets values for 0x0E								
-				STORE	s1,		(s0)				; store the entry in the table
-				ADD	s0,		01					; increment the table index
-				LOAD	s1,		SP_LFRRFR			; s1 gets values for 0x0F								
-				STORE	s1,		(s0)				; store the entry in the table
-				RETURN								; done...at last			
-				
-
-; =============================================================================
-; === btn2mot() - Button to MotCtl conversion function                      ===
-; === Registers affected: s1, s2                                            ===
-; === s0 contains the button value to convert.                              ===
-; === Result (Motor Control register value) is returned in s1               ===
-; === s0 (Button value) is not changed                                      ===
-; =============================================================================
-btn2mot:		LOAD	s2,		SP_BTNBASE			; s2 gets base of button conversion table
-				LOAD	s1,		s0					; mask out upper nibble of buttons
-				AND	s1,		MSKLOWNIB			; 
-				ADD	s2,		s1					; s2 = Base + offset into table		
-				FETCH	s1,		(s2)				; and fetch the entry
 				RETURN															
 
 				
@@ -816,62 +739,6 @@ move_stop:		LOAD 	s0, 		MV_STOP
 ; Nexys4 I/O Functions
 ;*************************
 
-;---------------------
-; DEB_rdbtns() - Reads the debounced pushbuttons
-;
-; Returns the 5 pushbuttons. The buttons are returned as follows
-; (assuming the inputs to the I/O interface matches this order)
-; example:
-;    bit  7    6      5        4        3        2        1         0
-;         r    r   	  r    btn_cntr  btn_left  btn_up  btn_right  btn_down
-;
-; where r = reserved. A value of 1 indicates that the button is pressed.  
-; A 0 indicates that the button is not pressed.
-;
-; Registers used s0
-;---------------------
-;DEB_rdbtns:	INPUT		s0,		PA_PBTNS			; read the buttons
-;				AND		s0,		MSK_ALLBTNS			; mask out unused bits
-;				RETURN								; and return
-				
-				
-;---------------------
-; DEB_rdsw() - Reads the low order debounced switches
-;
-; Returns the  low order switches  [7:0]. The switches are returned as follows
-; example:
-;    bit  7    6    5   4    3    2    1    0
-;        sw7  sw6  sw5 sw4  sw3  sw2  sw1  sw0
-;
-; where r = reserved, sw7 is the leftmost switch and sw0 is the rightmost
-; switch. A value of 1 indicates that the switch is on (up).  A 0 indicates that
-; the switch is off (down).
-;
-; Registers used s0
-;---------------------
-;DEB_rdsw:		INPUT		s0,		PA_SLSWTCH			; read the slide switches
-;				AND		s0,		MSK_ALLSW_LO	 	; mask out unused bits
-;				RETURN								; and return				
-
-				
-;---------------------
-; DEB_rdsw_hi() - Reads the high order debounced switches
-;
-; Returns the  high order switches  [155432:0]. The switches are returned as follows
-; example:
-;    bit   7     6     5    4     3     2     1    0
-;        sw15  sw14  sw13 sw12  sw11  sw10  sw9  sw8
-;
-; where r = reserved, sw15 is the leftmost switch and sw7 is the rightmost
-; switch. A value of 1 indicates that the switch is on (up).  A 0 indicates that
-; the switch is off (down).
-;
-; Registers used s0
-;---------------------
-;DEB_rdsw_hi:	INPUT		s0,		PA_SLSWTCH1508		; read the slide switches
-;				AND		s0,		MSK_ALLSW_HI	 	; mask out unused bits
-;				RETURN								; and return	
-								
 ;---------------------
 ; LED_wrleds() - Write the low order 8 LEDs
 ;

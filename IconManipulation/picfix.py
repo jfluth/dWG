@@ -30,10 +30,10 @@ TO USE:
 	that contains the image that you want to convert. Then type picfix.py!!!
 	
 	The code is easily changed but it is currently set up to work with an original
-	image the points north.
+	image that points north.
 	
 	User should ensure that the rotated picture will fit in the specified 
-	dimensions
+	dimensions or it will be clipped
 	
 	
 	
@@ -60,9 +60,7 @@ def Convert (ImageName):
 	if img45.mode != 'RGB':
 		img45 = img.convert('RGB')
 		
-	
-	
-	# Store Width and height of transformed image
+	# Store width and height of transformed image
 	# If these dont equal the specified size, something went wrong 
 	# with the above steps
 	width 	= img.size[0]
@@ -91,14 +89,14 @@ def Convert (ImageName):
 					print 'Index Error Occurred At:'
 					print 'c: {}, r:{}'.format(c,r)
 					sys.exit()
-				# convert the value 
+				# convert the value to 12 bit
 				R = hex(R*15/255)[2:]
 				G = hex(G*15/255)[2:]
 				B = hex(B*15/255)[2:]
 				ColorValue = R+G+B
 				
-				# Check for Value Error, happened when the case of the pixel being 
-				# zero was not handled properly	
+				# Check for Value Error (happens when the case of the pixel being 
+				# zero was not handled properly)
 				try:
 					oFile.write("iconPixArray[%d] = 12'h%3.2X;\n"%(cnt, int(ColorValue,16)))
 				except ValueError:
@@ -108,9 +106,6 @@ def Convert (ImageName):
 					print 'Rb:{0} Gb:{1} Bb:{2}'.format(Rb,Gb,Bb)
 					sys.exit()
 				cnt += 1
-	
-	
-	
 	
 	oFile.write('\n/**********************************************\n')
 	oFile.write('*****  End of array template\n')
